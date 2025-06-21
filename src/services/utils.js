@@ -92,7 +92,7 @@ export const headCells = [
   },
 ];
 
-function calculateAge(birthTimestampSec) {
+export function calculateAge(birthTimestampSec) {
   const birthDate = new Date(birthTimestampSec * 1000);
   const now = new Date();
 
@@ -119,7 +119,8 @@ function calculateAge(birthTimestampSec) {
       : `${years} year${years !== 1 ? 's' : ''}`;
   }
 }
-function translateAgeString(ageString) {
+
+export function translateAgeString(ageString) {
   return ageString
     .replace(/\byears\b/g, i18n.t('years'))
     .replace(/\byear\b/g, i18n.t('year'))

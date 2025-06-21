@@ -104,6 +104,7 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
           maxHeight: 300,
           minHeight: 300,
           overflow: 'auto',
+          pr: 'calc(24px / 2)', // half default padding if scrollbar is visible
         }}>
         <Box
           sx={{
@@ -125,30 +126,48 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
         {notes?.map((note, index) => {
           return (
             <span key={index}>
-              <ListItem>
-                <Box>
-                  <ListItemText
+              <ListItem
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  px: 0,
+                }}
+              >
+                <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                  <Typography
+                    variant="body1"
+                    noWrap
                     sx={{
-                      whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
+                      width: '100%',
+                      display: 'block',
                     }}
-                    primary={note.content}
-                  />
-                  <ListItemText
-                    secondary={(getFormattedDate(note.date.seconds))}
+                  >
+                    {note.content}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    noWrap
                     sx={{
-                      whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
+                      width: '100%',
+                      display: 'block',
                     }}
-                  />
+                  >
+                    {getFormattedDate(note.date.seconds)}
+                  </Typography>
                 </Box>
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    width: '100%'
+                    alignItems: 'center',
+                    flexShrink: 0,
                   }}>
                   <IconButton
                     sx={{ marginRight: 1 }}
@@ -166,8 +185,8 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
                   </IconButton>
                 </Box>
               </ListItem>
-              <Divider variant="middle" />
-            </span>
+              <Divider sx={{ width: '100%' }} />
+            </span >
           )
         })}
       </Paper >

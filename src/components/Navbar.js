@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
-import { IconButton, AppBar, Toolbar, Typography, Menu, MenuItem } from "@mui/material";
+import { IconButton, AppBar, Toolbar, Typography, Menu, MenuItem, Box } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import i18n from '../i18n';
@@ -48,11 +49,21 @@ const Navbar = ({ handleNavClick }) => {
           >
             <MenuIcon sx={{ color: 'secondary.main' }} />
           </IconButton>
-          <Typography
-            variant="h6"
-            sx={{ flexGrow: 1 }}>
-            {t('appTitle')}
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <RouterLink
+              to="/"
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                fontWeight: 500,
+                letterSpacing: 0.5,
+              }}
+            >
+              {t('appTitle')}
+            </RouterLink>
+          </Box>
           {/* Language Icon with Flag and Initials */}
           <Typography
             variant="bodyBold2"

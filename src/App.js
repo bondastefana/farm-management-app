@@ -13,6 +13,7 @@ import NotFound from './pages/NotFound';
 import { CssBaseline, Box } from "@mui/material";
 
 import Navbar from './components/Navbar'
+import Footer from './components/Footer';
 
 function App() {
   const [navOpen, setNavOpen] = useState(false);
@@ -25,7 +26,7 @@ function App() {
   return (
     <Router>
       <CssBaseline />
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Navbar handleNavClick={handleNavToggle} />
         {loading && (
           <Box
@@ -46,7 +47,7 @@ function App() {
           </Box>
         )}
         <Sidebar navOpen={navOpen} handleNavToggle={handleNavToggle} />
-        <Box component="main" sx={{ width: '100%', marginTop: '64px' }} p={2}>
+        <Box component="main" sx={{ width: '100%', marginTop: '64px', flex: 1 }} p={2}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/animals" element={<Animals />} />
@@ -56,6 +57,7 @@ function App() {
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>
         </Box>
+        <Footer />
       </Box>
     </Router>
   );
