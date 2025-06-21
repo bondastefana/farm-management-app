@@ -8,12 +8,12 @@ const SidebarItems = ({ handleRouteChange }) => {
   const { t } = useTranslation();
 
   return (
-    <List>
+    <List sx={{ width: '100%' }}>
       {[
         { text: t('dashboard'), icon: <Dashboard />, path: "/" },
-        { text: t('livestock'), icon: <Pets />, path: "/livestock" },
+        { text: t('animals'), icon: <Pets />, path: "/animals" },
         { text: t('tasks'), icon: <Task />, path: "/tasks" },
-        { text: t('resources'), icon: <Storage />, path: "/resources" },
+        { text: t('stocks'), icon: <Storage />, path: "/stocks" },
         { text: t('reports'), icon: <Assessment />, path: "/reports" },
       ].map((item) => (
         <ListItem

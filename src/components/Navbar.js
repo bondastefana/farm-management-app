@@ -34,17 +34,32 @@ const Navbar = ({ handleNavClick }) => {
 
   return (
     <>
-      <AppBar position="fixed" style={{ backgroundColor: '#E1C16E', borderRadius: 0 }}>
+      <AppBar
+        position="fixed"
+        style={{
+          backgroundColor: '#E1C16E',
+          borderRadius: 0
+        }}>
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleNavToggle}>
-            <MenuIcon />
+          <IconButton
+            edge="start"
+            aria-label="menu"
+            onClick={handleNavToggle}
+          >
+            <MenuIcon sx={{ color: 'secondary.main' }} />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{ flexGrow: 1 }}>
             {t('appTitle')}
           </Typography>
-
           {/* Language Icon with Flag and Initials */}
-          <Typography variant="bodyBold2" style={{ marginRight: 5, marginTop: 3 }}>
+          <Typography
+            variant="bodyBold2"
+            style={{
+              marginRight: 5,
+              marginTop: 3
+            }}>
             {selectedLanguage === 'en' ? 'EN' : 'RO'}
           </Typography>
           <IconButton
@@ -53,10 +68,14 @@ const Navbar = ({ handleNavClick }) => {
             aria-controls="language-menu"
             aria-haspopup="true"
           >
-            <FlagIcon code={selectedLanguageCode} style={{ width: 20, height: 15, marginRight: 5 }} />
-
+            <FlagIcon
+              code={selectedLanguageCode}
+              style={{
+                width: 20,
+                height: 15,
+                marginRight: 5
+              }} />
           </IconButton>
-
           {/* Language Dropdown Menu */}
           <Menu
             id="language-menu"
@@ -68,13 +87,25 @@ const Navbar = ({ handleNavClick }) => {
             <MenuItem
               onClick={() => handleLanguageChange('en', 'GB')}
             >
-              <FlagIcon code="GB" style={{ width: 20, height: 15, marginRight: 5 }} />
+              <FlagIcon
+                code="GB"
+                style={{
+                  width: 20,
+                  height: 15,
+                  marginRight: 5
+                }} />
               {t('english')}
             </MenuItem>
             <MenuItem
               onClick={() => handleLanguageChange('ro', 'RO')}
             >
-              <FlagIcon code="RO" style={{ width: 20, height: 15, marginRight: 5 }} />
+              <FlagIcon
+                code="RO"
+                style={{
+                  width: 20,
+                  height: 15,
+                  marginRight: 5
+                }} />
               {t('romanian')}
             </MenuItem>
           </Menu>

@@ -55,10 +55,11 @@ const theme = createTheme({
         root: {
           borderRadius: '8px', // Rounded corners for buttons
           padding: '10px 20px', // Adequate button padding
-          color: primaryColor,
-          backgroundColor: secondaryColor,
+          color: secondaryColor,
+          backgroundColor: primaryColor,
           '&:hover': {
-            backgroundColor: secondaryColorHover, // Darker shade of secondary color for hover (adjust as needed)
+            backgroundColor: secondaryColorHover,
+            color: primaryColor,
           },
         },
       },
@@ -88,7 +89,7 @@ const theme = createTheme({
     MuiSvgIcon: {
       styleOverrides: {
         root: {
-          color: secondaryColor, // Apply secondary color to all icons
+          color: primaryColor, // Apply secondary color to all icons
         },
       },
     },
@@ -104,6 +105,13 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           borderRadius: 0, // Set the desired border-radius
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: primaryColor, // Set the default color to primary
         },
       },
     },

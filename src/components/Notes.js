@@ -12,18 +12,24 @@ import {
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeIcon from '@mui/icons-material/Mode';
-
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useLoading } from '../contexts/LoadingContext';
-import { deleteNote, updateNote } from "../services/farmService";
+import { deleteNote, updateNote, addNote } from "../services/farmService";
+import { getFormattedDate } from '../services/utils';
 import DeleteNoteModal from './DeleteNoteModal';
 import EditNoteModal from './EditNoteModal';
+import AddNoteModal from './AddNoteModal';
+
+import useAlert from '../hooks/useAlert';
 
 
 const Notes = ({ notes = [], fetchNotesInfo }) => {
   const { t } = useTranslation(); // 't' is the translation function
   const [deletedNote, setDeletedNote] = React.useState(null);
   const [editedNote, setEditedNote] = React.useState(null);
+  const [addedNote, setAddedNote] = React.useState(false);
   const { setLoading } = useLoading();
+  const { showAlert, AlertComponent } = useAlert();
 
   // DELETE
   const handleDeleteNote = React.useCallback(async (note) => {
@@ -39,8 +45,32 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
       setDeletedNote(null);
       await fetchNotesInfo();
       setLoading(false);
+      showAlert('Notita a fost stearsa cu succes');
     }
-  }, [fetchNotesInfo, setLoading])
+  }, [fetchNotesInfo, setLoading, showAlert])
+
+  // NEW
+  const handleAddNote = React.useCallback(async (note) => {
+    setAddedNote(true);
+  }, [])
+  const handleAddNoteClosed = React.useCallback(() => {
+    setAddedNote(null);
+  }, [])
+  const handleAddNoteSave = React.useCallback(async (content) => {
+    setLoading(true);
+    const newNote = {
+      content: content,
+      date: new Date(Date.now()),
+      userId: "admin"
+    }
+    const isNoteSaved = await addNote(newNote);
+    if (isNoteSaved) {
+      setAddedNote(false);
+      await fetchNotesInfo();
+      setLoading(false);
+      showAlert('Notita a fost salvata cu succes');
+    }
+  }, [fetchNotesInfo, setLoading, showAlert])
 
   // EDIT
   const handleEditNote = React.useCallback(async (note) => {
@@ -60,8 +90,9 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
       setEditedNote(null);
       await fetchNotesInfo();
       setLoading(false);
+      showAlert('Notita a fost editata cu succes');
     }
-  }, [editedNote, fetchNotesInfo, setLoading])
+  }, [editedNote, fetchNotesInfo, setLoading, showAlert])
 
 
   return (
@@ -69,17 +100,32 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
       <Paper
         elevation={3}
         sx={{
-          padding: 3
+          padding: 3,
+          maxHeight: 300,
+          minHeight: 300,
+          overflow: 'auto',
         }}>
-        <Typography align="center" variant="h4">{t('notes')}</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}  >
+          <Typography
+            align="center"
+            variant="h4"
+            mr={1}
+          >
+            {t('notes')}
+          </Typography>
+          <IconButton onClick={handleAddNote} >
+            <PlaylistAddIcon />
+          </IconButton>
+        </Box>
         {notes?.map((note, index) => {
-          const date = new Date(note.date.seconds);
-          const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
           return (
-            <>
-              <ListItem
-                key={index}
-              >
+            <span key={index}>
+              <ListItem>
                 <Box>
                   <ListItemText
                     sx={{
@@ -90,23 +136,41 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
                     primary={note.content}
                   />
                   <ListItemText
-                    secondary={formattedDate}
+                    secondary={(getFormattedDate(note.date.seconds))}
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
                   />
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-                  <IconButton sx={{ marginRight: 1 }} edge="end" aria-label="edit" onClick={() => handleEditNote(note)}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    width: '100%'
+                  }}>
+                  <IconButton
+                    sx={{ marginRight: 1 }}
+                    edge="end"
+                    aria-label="edit"
+                    onClick={() => handleEditNote(note)}>
                     <ModeIcon />
                   </IconButton>
-                  <IconButton sx={{ marginRight: 1 }} edge="end" aria-label="delete" onClick={() => handleDeleteNote(note)}>
+                  <IconButton
+                    sx={{ marginRight: 1 }}
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDeleteNote(note)}>
                     <DeleteIcon />
                   </IconButton>
                 </Box>
               </ListItem>
               <Divider variant="middle" />
-            </>
+            </span>
           )
         })}
-      </Paper>
+      </Paper >
       <DeleteNoteModal
         open={!!deletedNote}
         note={deletedNote}
@@ -121,6 +185,14 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
         onClose={handleEditClosed}
         onSave={handleEditConfirm}
       />
+      <AddNoteModal
+        open={!!addedNote}
+        note={addedNote}
+        onClose={handleAddNoteClosed}
+        onSave={handleAddNoteSave}
+      />
+
+      {AlertComponent}
     </>
   );
 };

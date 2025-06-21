@@ -5,9 +5,9 @@ import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import CircularProgress from '@mui/material/CircularProgress';
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
-import Livestocks from "./pages/Livestocks";
+import Animals from "./pages/Animals";
 import Tasks from "./pages/Tasks";
-import Resources from "./pages/Resources";
+import Stocks from "./pages/Stocks";
 import Reports from "./pages/Reports";
 import NotFound from './pages/NotFound';
 import { CssBaseline, Box } from "@mui/material";
@@ -49,9 +49,9 @@ function App() {
         <Box component="main" sx={{ width: '100%', marginTop: '64px' }} p={2}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/livestock" element={<Livestocks />} />
+            <Route path="/animals" element={<Animals />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/resources" element={<Resources />} />
+            <Route path="/stocks" element={<Stocks />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>

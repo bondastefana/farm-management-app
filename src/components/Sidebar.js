@@ -55,7 +55,6 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
       onClose={handleNavToggle}
     >
       {drawerContent}
-
       <Box display="flex" justifyContent="flex-end" flexDirection="column">
         <Divider variant="middle" />
         <Box display="flex" alignItems="center" flexDirection="column" p={2}>

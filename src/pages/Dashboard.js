@@ -6,16 +6,16 @@ import { useTranslation } from "react-i18next";
 
 import Weather from "../components/Weather";
 import Notes from '../components/Notes';
+import Employees from '../components/Employees';
+import FarmInfo from "../components/FarmInfo"
 import { useLoading } from '../contexts/LoadingContext';
 
-import { fetchNotes } from '../services/farmService';
+import { fetchNotes, fetchEmployees } from '../services/farmService';
 
 const Dashboard = () => {
   const { t } = useTranslation();
   const [location, setLocation] = useState(null);
   const { setLoading } = useLoading();
-
-  // State for farm info and note
   const [farmInfo, setFarmInfo] = useState({
     name: "",
     location: "",
@@ -24,27 +24,44 @@ const Dashboard = () => {
     established: "",
     description: "",
   });
-
   const [notes, setNotes] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
-  // Fetch farm info from Firestore
   const fetchFarmInfo = React.useCallback(async () => {
-    setLoading(true);
     const docRef = doc(db, "dashboard", "farmInfo");
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       setFarmInfo(docSnap.data());
     }
-    setLoading(false);
-  }, [setLoading]);
+  }, []);
 
   // Fetch notes from Firestore
   const fetchNotesInfo = React.useCallback(async () => {
+    const notesDetail = await fetchNotes();
+    const sortedNotes = notesDetail.sort((a, b) => b.date.seconds - a.date.seconds)
+    setNotes(sortedNotes);
+  }, [])
+
+  const fetchEmployeesInfo = React.useCallback(async () => {
+    const employeeDetail = await fetchEmployees();
+    const sortedEmployees = employeeDetail.sort((a, b) => b.employmentDate.seconds - a.employmentDate.seconds)
+    setEmployees(sortedEmployees);
+  }, [])
+
+  const fetchAllData = React.useCallback(async () => {
     setLoading(true);
-    const notesDetail = await fetchNotes(); // Use the getTasks function
-    setNotes(notesDetail);
-    setLoading(false)
-  }, [setLoading])
+
+    try {
+      await Promise.all([
+        fetchFarmInfo(),
+        fetchNotesInfo(),
+        fetchEmployeesInfo(),
+      ]);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  }, [fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo, setLoading])
 
 
   useEffect(() => {
@@ -61,68 +78,19 @@ const Dashboard = () => {
       );
     }
 
-    fetchFarmInfo();
-    fetchNotesInfo();
-  }, [fetchFarmInfo, fetchNotesInfo]);
-
-
+    fetchAllData();
+  }, [fetchAllData, fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo]);
 
   return (
     <Grid container spacing={2}>
-      {/* <Grid item xs={12} md={6}>
-          <Paper
-            elevation={3}
-          >
-            <Typography variant="h5">
-              Farm Info
-            </Typography>
-
-
-            {loading ? (
-              <CircularProgress />
-            ) : (
-
-              <FarmInfo farmInfo={farmInfo} />
-            )
-            }
-          </Paper>
-        </Grid> */}
-
-      {/* Notes
-        <Grid item xs={12} md={6}>
-          <Paper
-            elevation={3}
-          >
-            <Typography variant="h5" >
-              Notes
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              minRows={6}
-              variant="outlined"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <Button
-              onClick={saveNote}
-              variant="contained"
-            >
-              {t('save')}
-            </Button>
-          </Paper>
-        </Grid>
-      </Grid> */}
-
-      {/* Weather  */}
       <Grid size={{ xs: 12, md: 4 }}>
         <Notes notes={notes} fetchNotesInfo={fetchNotesInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
-        <Notes notes={notes} fetchNotesInfo={fetchNotesInfo} />
+        <Employees employees={employees} fetchNotesInfo={fetchEmployeesInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
-        <Notes notes={notes} fetchNotesInfo={fetchNotesInfo} />
+        <FarmInfo farmInfo={farmInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <Weather location={location} />
@@ -131,7 +99,6 @@ const Dashboard = () => {
         <Weather location={location} />
       </Grid>
     </Grid>
-
   );
 };
 
