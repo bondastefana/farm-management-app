@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/%20//bondastefana.github.io/farm-management-app/static/css/main.d64e492e.css",
+    "main.js": "/%20//bondastefana.github.io/farm-management-app/static/js/main.1e48ae12.js",
+    "static/js/453.645c44bf.chunk.js": "/%20//bondastefana.github.io/farm-management-app/static/js/453.645c44bf.chunk.js",
+    "index.html": "/%20//bondastefana.github.io/farm-management-app/index.html",
+    "main.d64e492e.css.map": "/%20//bondastefana.github.io/farm-management-app/static/css/main.d64e492e.css.map",
+    "main.1e48ae12.js.map": "/%20//bondastefana.github.io/farm-management-app/static/js/main.1e48ae12.js.map",
+    "453.645c44bf.chunk.js.map": "/%20//bondastefana.github.io/farm-management-app/static/js/453.645c44bf.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d64e492e.css",
+    "static/js/main.1e48ae12.js"
+  ]
+}
