@@ -6,7 +6,6 @@ import AddAnimalForm from "../components/AddAnimalForm";
 import { Grid } from "@mui/material";
 import { useLoading } from '../contexts/LoadingContext';
 import { fetchCows, fetchHorses } from '../services/farmService';
-import { COW, HORSE } from '../services/constants';
 import { useIsAdmin } from '../contexts/IsAdminContext';
 
 const Livestock = () => {

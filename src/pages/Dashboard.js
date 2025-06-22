@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Grid } from "@mui/material";
 import db from "../firebase/firebaseConfig"; // Firebase setup
 import { doc, getDoc } from "firebase/firestore"; // Firestore functions
-import { useTranslation } from "react-i18next";
 
 import Weather from "../components/Weather";
 import Notes from '../components/Notes';
@@ -14,7 +13,6 @@ import { useLoading } from '../contexts/LoadingContext';
 import { fetchNotes, fetchEmployees, fetchTasks } from '../services/farmService';
 
 const Dashboard = () => {
-  const { t } = useTranslation();
   const [location, setLocation] = useState(null);
   const { setLoading } = useLoading();
   const [farmInfo, setFarmInfo] = useState({

@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Typography, Paper, Grid } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { formatDate } from '../services/farmService';
 import { WEATHER_API_KEY, GOOGLE_API_KEY } from '../services/constants';

@@ -8,10 +8,9 @@ import {
   CloudySnowing
 } from "@mui/icons-material";
 
-import { doc, getDoc, setDoc, addDoc, collection, getDocs, deleteDoc, updateDoc, listCollections } from "firebase/firestore";
+import { addDoc, collection, getDocs, deleteDoc, updateDoc, doc, setDoc } from "firebase/firestore";
 import db from "../firebase/firebaseConfig";
 import i18n from '../i18n';
-import { COW_RO } from './constants';
 
 export const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
