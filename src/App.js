@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import './index.css';
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import CircularProgress from '@mui/material/CircularProgress';
 import Sidebar from "./components/Sidebar";
@@ -15,6 +15,11 @@ import { CssBaseline, Box } from "@mui/material";
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
 import Login from "./pages/Login";
+
+function PrivateRoute({ children }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
 
 function AppContent() {
   const [navOpen, setNavOpen] = useState(false);
@@ -53,13 +58,18 @@ function AppContent() {
         {!isLoginPage && <Sidebar navOpen={navOpen} handleNavToggle={handleNavToggle} />}
         <Box component="main" sx={{ width: '100%', marginTop: !isLoginPage ? '64px' : 0, flex: 1 }} p={isLoginPage ? 0 : 2}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/animals" element={<Animals />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/stocks" element={<Stocks />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
+            <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/animals" element={<PrivateRoute><Animals /></PrivateRoute>} />
+            <Route path="/tasks" element={<PrivateRoute><Tasks /></PrivateRoute>} />
+            <Route path="/stocks" element={<PrivateRoute><Stocks /></PrivateRoute>} />
+            <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
+            {/* Only protect NotFound for authenticated users, but redirect / to / if authenticated */}
+            <Route path="*" element={
+              localStorage.getItem('isAuthenticated') === 'true'
+                ? <Navigate to="/" replace />
+                : <PrivateRoute><NotFound /></PrivateRoute>
+            } />
           </Routes>
         </Box>
         {!isLoginPage && <Footer />}
