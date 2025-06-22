@@ -29,7 +29,7 @@ const AddTaskModal = ({ open, onClose, onSave }) => {
     await onSave({
       title,
       description,
-      assignee,
+      assignee, // userName only
       completed,
       date: { seconds: Math.floor(new Date(date).getTime() / 1000) },
     });
@@ -84,8 +84,8 @@ const AddTaskModal = ({ open, onClose, onSave }) => {
               onChange={e => setAssignee(e.target.value)}
             >
               {employees.map(emp => (
-                <MenuItem key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
-                  {emp.firstName} {emp.lastName}
+                <MenuItem key={emp.id} value={emp.userName}>
+                  {emp.userName} ({emp.firstName} {emp.lastName})
                 </MenuItem>
               ))}
             </Select>

@@ -92,6 +92,7 @@ export const fetchCows = async () => {
     const cows = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      species: 'cow',
     }));
     return cows;
   } catch (error) {
@@ -106,6 +107,7 @@ export const fetchHorses = async () => {
     const horse = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      species: 'horse',
     }));
     return horse;
   } catch (error) {
@@ -121,13 +123,21 @@ export const addAnimal = async ({ animalId, birthDate, gender, observation, trea
     gender,
     observation,
     treatment,
+  };
+  let collectionToAdd;
+  if (species === 'cow') {
+    collectionToAdd = cowsCollectionRef;
+  } else if (species === 'horse') {
+    collectionToAdd = horseCollectionRef;
+  } else {
+    console.error('Unknown species for addAnimal:', species);
+    return false;
   }
-  const collectionToAdd = species === COW_RO ? cowsCollectionRef : horseCollectionRef;
   try {
     await addDoc(collectionToAdd, newAnimal);
     return true;
   } catch (error) {
-    console.error("Error adding note:", error);
+    console.error('Error adding animal:', error);
     return false;
   }
 };
@@ -254,6 +264,92 @@ export const authenticateUser = async (username, password) => {
     console.error('Error authenticating user:', error);
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('authUser');
+    return false;
+  }
+};
+
+export const updateEmployee = async (userName, updatedData) => {
+  try {
+    // Update in authentication collection
+    const authSnapshot = await getDocs(authCollectionRef);
+    const authDoc = authSnapshot.docs.find(doc => doc.data().userName === userName);
+    if (authDoc) {
+      await updateDoc(doc(db, 'authentication', authDoc.id), updatedData);
+    }
+    // Update in users collection
+    const usersSnapshot = await getDocs(usersCollectionRef);
+    const userDoc = usersSnapshot.docs.find(doc => doc.data().userName === userName);
+    if (userDoc) {
+      await updateDoc(doc(db, 'users', userDoc.id), updatedData);
+    }
+    return true;
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    return false;
+  }
+};
+
+export const deleteEmployee = async (userName) => {
+  try {
+    // Delete from authentication collection
+    const authSnapshot = await getDocs(authCollectionRef);
+    const authDoc = authSnapshot.docs.find(doc => doc.data().userName === userName);
+    if (authDoc) {
+      await deleteDoc(doc(db, 'authentication', authDoc.id));
+    }
+    // Delete from users collection
+    const usersSnapshot = await getDocs(usersCollectionRef);
+    const userDoc = usersSnapshot.docs.find(doc => doc.data().userName === userName);
+    if (userDoc) {
+      await deleteDoc(doc(db, 'users', userDoc.id));
+    }
+    return true;
+  } catch (error) {
+    console.error('Error deleting employee:', error);
+    return false;
+  }
+};
+
+export const updateAnimal = async (species, animalId, updatedData) => {
+  let collectionRef;
+  if (species === 'cow') {
+    collectionRef = cowsCollectionRef;
+  } else if (species === 'horse') {
+    collectionRef = horseCollectionRef;
+  } else {
+    console.error('Unknown species for updateAnimal:', species);
+    return false;
+  }
+  try {
+    const snapshot = await getDocs(collectionRef);
+    const docToUpdate = snapshot.docs.find(doc => doc.data().animalId === animalId);
+    if (!docToUpdate) return false;
+    await updateDoc(doc(db, docToUpdate.ref.path), updatedData);
+    return true;
+  } catch (error) {
+    console.error('Error updating animal:', error);
+    return false;
+  }
+};
+
+export const deleteAnimal = async (species, animalId) => {
+  let collectionRef;
+  if (species === 'cow') {
+    collectionRef = cowsCollectionRef;
+  } else if (species === 'horse') {
+    collectionRef = horseCollectionRef;
+  } else {
+    console.error('Unknown species for deleteAnimal:', species);
+    return false;
+  }
+  try {
+    const snapshot = await getDocs(collectionRef);
+    const docToDelete = snapshot.docs.find(doc => doc.data().animalId === animalId);
+    if (!docToDelete) return false;
+    await deleteDoc(doc(db, docToDelete.ref.path));
+    return true;
+  } catch (error) {
+    console.error('Error deleting animal:', error);
     return false;
   }
 };

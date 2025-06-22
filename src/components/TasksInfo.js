@@ -7,10 +7,12 @@ import { getFormattedDate } from '../services/utils';
 import AddTaskModal from './AddTaskModal';
 import EditTaskModal from './EditTaskModal';
 import DeleteTaskModal from './DeleteTaskModal';
-import { addTask, updateTask, deleteTask } from '../services/farmService';
+import { addTask, updateTask, deleteTask, fetchTasks } from '../services/farmService';
 import EditIcon from '@mui/icons-material/Mode';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from "react-i18next";
+import { useIsAdmin } from '../contexts/IsAdminContext';
+import useAlert from '../hooks/useAlert';
 
 const TasksInfo = ({ tasks, fetchTasksInfo }) => {
   const { t } = useTranslation();
@@ -19,26 +21,52 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const isAdmin = useIsAdmin();
+  const [allTasks, setAllTasks] = useState([]);
+  const { showAlert, AlertComponent } = useAlert();
+
+  // Always sync allTasks with tasks prop on mount and when tasks changes
+  React.useEffect(() => {
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    setAllTasks(isAdmin ? (tasks || []) : (tasks || []).filter(t => t.assignee === authUser.username));
+  }, [tasks, isAdmin]);
+
+  // Poll for new tasks every 30 seconds
+  React.useEffect(() => {
+    let mounted = true;
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    const poll = async () => {
+      const newTasks = await fetchTasks();
+      const filteredNewTasks = isAdmin ? newTasks : newTasks.filter(t => t.assignee === authUser.username);
+      if (mounted) setAllTasks(filteredNewTasks);
+    };
+    poll(); // initial fetch
+    const intervalId = setInterval(poll, 30000);
+    return () => { mounted = false; clearInterval(intervalId); };
+  }, [isAdmin]);
 
   const handleAddTask = useCallback(async (task) => {
     await addTask(task);
     setAddModalOpen(false);
+    showAlert(t('add_task_success'), 'success');
     if (fetchTasksInfo) fetchTasksInfo();
-  }, [fetchTasksInfo]);
+  }, [fetchTasksInfo, showAlert, t]);
 
   const handleEditTask = useCallback(async (updatedTask) => {
     await updateTask(updatedTask.id, updatedTask);
     setEditModalOpen(false);
     setTaskToEdit(null);
+    showAlert(t('edit_task_success'), 'success');
     if (fetchTasksInfo) fetchTasksInfo();
-  }, [fetchTasksInfo]);
+  }, [fetchTasksInfo, showAlert, t]);
 
   const handleDeleteTask = useCallback(async (taskId) => {
     await deleteTask(taskId);
     setDeleteModalOpen(false);
     setTaskToDelete(null);
+    showAlert(t('delete_task_success'), 'success');
     if (fetchTasksInfo) fetchTasksInfo();
-  }, [fetchTasksInfo]);
+  }, [fetchTasksInfo, showAlert, t]);
 
   const handleOpenAddModal = useCallback(() => setAddModalOpen(true), []);
   const handleCloseAddModal = useCallback(() => setAddModalOpen(false), []);
@@ -62,96 +90,103 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
   }, []);
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 4, minHeight: 320, maxHeight: 638, overflowY: 'auto' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Typography
-          align="center"
-          variant="h4"
-          mr={1}
+    <>
+      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 4, minHeight: 320, maxHeight: 638, overflowY: 'auto' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          {t('tasks_title')}
-        </Typography>
-        <IconButton onClick={handleOpenAddModal}>
-          <AddIcon />
-        </IconButton>
-      </Box>
-      <List>
-        {tasks.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
-            {t('no_tasks_available')}
+          <Typography
+            align="center"
+            variant="h4"
+            mr={1}
+          >
+            {t('tasks_title')}
           </Typography>
-        )}
-        {tasks.map((task) => (
-          <ListItem key={task.id} alignItems="center" sx={{ mb: 1, borderRadius: 2, bgcolor: task.completed ? 'success.lighter' : 'warning.lighter', boxShadow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 0 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2 }}>
-              <ListItemIcon sx={{ minWidth: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                {task.completed ? (
-                  <AssignmentTurnedInIcon color="success" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
-                ) : (
-                  <AssignmentLateIcon color="warning" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
-                )}
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {task.title}
-                    </Typography>
-                    <Chip label={task.completed ? t('completed') : t('pending')} size="small" color={task.completed ? 'success' : 'warning'} />
-                  </Box>
-                }
-                secondary={
-                  <>
-                    <Typography variant="body2" color="text.secondary">
-                      {task.description}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
-                      <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '1rem' }}>
-                        {t('assignee')}: <b>{task.assignee || 'N/A'}</b>
+          {isAdmin && (
+            <IconButton onClick={handleOpenAddModal}>
+              <AddIcon />
+            </IconButton>
+          )}
+        </Box>
+        <List>
+          {allTasks.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
+              {t('no_tasks_available')}
+            </Typography>
+          )}
+          {allTasks.map((task) => (
+            <ListItem key={task.id} alignItems="center" sx={{ mb: 1, borderRadius: 2, bgcolor: task.completed ? 'success.lighter' : 'warning.lighter', boxShadow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 0 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2 }}>
+                <ListItemIcon sx={{ minWidth: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', pl: 2 }}>
+                  {task.completed ? (
+                    <AssignmentTurnedInIcon color="success" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
+                  ) : (
+                    <AssignmentLateIcon color="warning" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        {task.title}
                       </Typography>
-                      <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '1rem' }}>
-                        {getFormattedDate(task.date?.seconds || 0)}
-                      </Typography>
+                      <Chip label={task.completed ? t('completed') : t('pending')} size="small" color={task.completed ? 'success' : 'warning'} />
                     </Box>
-                  </>
-                }
-              />
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, ml: 2 }}>
-              <IconButton
-                sx={{
-                  marginRight: 1,
-                }}
-                edge="end"
-                aria-label="edit"
-                onClick={() => handleOpenEditModal(task)}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                sx={{
-                  marginRight: 1,
-                }}
-                edge="end"
-                aria-label="delete"
-                onClick={() => handleOpenDeleteModal(task)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Box>
-          </ListItem>
-        ))}
-      </List>
-      <AddTaskModal open={addModalOpen} onClose={handleCloseAddModal} onSave={handleAddTask} />
-      <EditTaskModal open={editModalOpen} onClose={handleCloseEditModal} onSave={handleEditTask} task={taskToEdit} />
-      <DeleteTaskModal open={deleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleDeleteTask} task={taskToDelete} />
-    </Paper>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2" color="text.secondary">
+                        {task.description}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
+                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '1rem' }}>
+                          {t('assignee')}: <b>{task.assignee || 'N/A'}</b>
+                        </Typography>
+                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '1rem' }}>
+                          {getFormattedDate(task.date?.seconds || 0)}
+                        </Typography>
+                      </Box>
+                    </>
+                  }
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, ml: 2 }}>
+                <IconButton
+                  sx={{
+                    marginRight: 1,
+                  }}
+                  edge="end"
+                  aria-label="edit"
+                  onClick={() => handleOpenEditModal(task)}
+                >
+                  <EditIcon />
+                </IconButton>
+                {isAdmin && (
+                  <IconButton
+                    sx={{
+                      marginRight: 1,
+                    }}
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleOpenDeleteModal(task)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                )}
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+        <AddTaskModal open={addModalOpen} onClose={handleCloseAddModal} onSave={handleAddTask} />
+        <EditTaskModal open={editModalOpen} onClose={handleCloseEditModal} onSave={handleEditTask} task={taskToEdit} />
+        <DeleteTaskModal open={deleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleDeleteTask} task={taskToDelete} />
+      </Paper>
+      {AlertComponent}
+    </>
   );
 };
 

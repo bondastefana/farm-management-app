@@ -43,7 +43,7 @@ const AddNoteModal = ({ open, onClose, note, onSave }) => {
           rows={4}
           value={addNote}
           onChange={handleNoteChange}
-          variant="contained"
+          variant="outlined"
           label={t('addNoteModalContent')}
         />
       </DialogContent>

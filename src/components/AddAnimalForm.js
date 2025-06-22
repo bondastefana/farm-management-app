@@ -29,6 +29,7 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
   const [formData, setFormData] = useState(initialState);
 
   const handleChange = (field) => (event) => {
+    console.log('handleChange', field, event.target.value);
     const value = event.target.value;
     setFormData((prev) => ({
       ...prev,
@@ -37,34 +38,75 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
   };
 
   const handleSaveAnimal = async () => {
+    if (!formData.species) {
+      showAlert(t('species') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    if (!formData.animalId) {
+      showAlert(t('nr_crt') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    if (!formData.birthDate) {
+      showAlert(t('birth_date') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    // Validate date
+    const birthDateTimestamp = new Date(formData.birthDate).getTime();
+    if (isNaN(birthDateTimestamp)) {
+      showAlert(t('birth_date') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    if (!formData.gender) {
+      showAlert(t('gender') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    if (!formData.treatment) {
+      showAlert(t('treatment') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    if (!formData.observation) {
+      showAlert(t('observations') + ' ' + t('is_required'), 'error');
+      return;
+    }
+    console.log('formData', formData);
+    const speciesKey = formData.species; // now always 'cow' or 'horse'
     const dataToSave = {
       animalId: formData.animalId,
-      birthDate: formData.birthDate,
+      birthDate: birthDateTimestamp, // always a valid timestamp
       gender: formData.gender,
       treatment: formData.treatment,
       observation: formData.observation,
-      species: formData.species,
+      species: speciesKey,
     };
 
     setLoading(true);
-    const isAnimalSaved = await addAnimal(dataToSave);
-    if (isAnimalSaved) {
-      await refetchAllAnimals();
+    try {
+      const isAnimalSaved = await addAnimal(dataToSave, speciesKey);
+      if (isAnimalSaved) {
+        await refetchAllAnimals();
+        setLoading(false);
+        showAlert(t('animal_save_success'), 'success');
+        setFormData(initialState);
+        const tableElement = document.getElementById(speciesKey);
+        if (tableElement) tableElement.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        setLoading(false);
+        showAlert(t('animal_save_error'), 'error');
+      }
+    } catch (e) {
       setLoading(false);
-      showAlert('Exemplarul a fost salvat cu succes!');
-      setFormData(initialState);
-      const tableElement = document.getElementById(formData.species);
-      tableElement.scrollIntoView({ behavior: 'smooth' });
+      showAlert(t('animal_save_error'), 'error');
     }
   };
 
   const generateSpecies = () => {
-    return [t(COW), t(HORSE)].map((species) => {
-      return (
-        <MenuItem value={species}>{species}</MenuItem>
-      )
-    })
-  }
+    return [
+      { key: 'cow', label: t(COW) },
+      { key: 'horse', label: t(HORSE) }
+    ].map(({ key, label }) => (
+      <MenuItem value={key} key={key}>{label}</MenuItem>
+    ));
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -81,6 +123,7 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
               value={formData.species}
               onChange={handleChange('species')}
               InputLabelProps={{ shrink: true }}
+              required
             >
               {generateSpecies()}
             </TextField>

@@ -1,6 +1,12 @@
 import React from "react";
 import { Typography, Paper, CardContent, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import StraightenIcon from '@mui/icons-material/Straighten';
+import PersonIcon from '@mui/icons-material/Person';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const FarmInfo = ({ farmInfo = {} }) => {
   const { name, location, size, owner, established, description, employeesNumber } = farmInfo;
@@ -36,24 +42,29 @@ const FarmInfo = ({ farmInfo = {} }) => {
           </Typography>
           <Box component="span" sx={{ fontSize: 22, ml: 1 }} role="img" aria-label="farm">🌾</Box>
         </Box>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('location')}: </strong> {location} <span role="img" aria-label="location">📍</span>
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('size')}: </strong> {size}+ <span role="img" aria-label="size">📏</span>
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('owner')}: </strong> {owner} <span role="img" aria-label="owner">👤</span>
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('establishment')}: </strong> {established} <span role="img" aria-label="established">🏛️</span>
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('employeesNumber')}: </strong> {employeesNumber} <span role="img" aria-label="employees">🧑‍🌾</span>
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
-          <strong>{t('description')}: </strong> {description} <span role="img" aria-label="desc">✨</span>
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
+            <LocationOnIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('location')}:</strong>&nbsp;{location}
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
+            <StraightenIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('size')}:</strong>&nbsp;{size}+
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
+            <PersonIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('owner')}:</strong>&nbsp;{owner}
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
+            <AccountBalanceIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('establishment')}:</strong>&nbsp;{established}
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
+            <AgricultureIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('employeesNumber')}:</strong>&nbsp;{employeesNumber}
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'flex-start' }}>
+            <InfoOutlinedIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563', mt: '2px' }} />
+            <Box component="span" sx={{ display: 'inline', ml: 0, wordBreak: 'break-word' }}>
+              <strong>{t('description')}:</strong>&nbsp;{description}
+            </Box>
+          </Typography>
+        </Box>
       </CardContent>
     </Paper>
   )

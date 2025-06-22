@@ -11,8 +11,27 @@ import FlagIcon from 'react-world-flags';
 const Navbar = ({ handleNavClick }) => {
   const { t } = useTranslation(); // 't' is the translation function
   const [anchorEl, setAnchorEl] = useState(null); // State for the dropdown menu
-  const [selectedLanguage, setSelectedLanguage] = useState('en'); // Default language is 'en'
-  const [selectedLanguageCode, setSelectedLanguageCode] = useState('GB'); // Default flag is 'GB' (UK)
+
+  const getInitialLanguage = () => {
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    if (authUser.language) {
+      return authUser.language;
+    }
+    return 'ro'; // Default to Romanian
+  };
+  const getInitialFlag = () => {
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    if (authUser.language === 'en') return 'GB';
+    if (authUser.language === 'ro') return 'RO';
+    return 'RO'; // Default to Romanian flag
+  };
+
+  const [selectedLanguage, setSelectedLanguage] = useState(getInitialLanguage());
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState(getInitialFlag());
+
+  React.useEffect(() => {
+    i18n.changeLanguage(selectedLanguage);
+  }, [selectedLanguage]);
 
   const handleClick = React.useCallback((event) => {
     setAnchorEl(event.currentTarget);
@@ -26,6 +45,9 @@ const Navbar = ({ handleNavClick }) => {
     i18n.changeLanguage(languageCode); // Change the language
     setSelectedLanguage(languageCode); // Set the language code (en, ro, etc.)
     setSelectedLanguageCode(flagCode); // Set the flag code (GB, RO, etc.)
+    // Save language in localStorage with user info
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    localStorage.setItem('authUser', JSON.stringify({ ...authUser, language: languageCode }));
     handleClose();
   }, [handleClose]);
 

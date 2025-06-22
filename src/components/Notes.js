@@ -59,10 +59,11 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
   }, [])
   const handleAddNoteSave = React.useCallback(async (content) => {
     setLoading(true);
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     const newNote = {
       content: content,
       date: new Date(Date.now()),
-      userId: "admin"
+      userName: authUser.username || ''
     }
     const isNoteSaved = await addNote(newNote);
     if (isNoteSaved) {
@@ -95,6 +96,11 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
     }
   }, [editedNote, fetchNotesInfo, setLoading, showAlert])
 
+  // Get logged-in username
+  const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+  const loggedInUsername = authUser.username || '';
+  // Filter notes for logged-in user only
+  const userNotes = notes?.filter(note => note.userName === loggedInUsername);
 
   return (
     <>
@@ -124,7 +130,7 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
             <AddIcon />
           </IconButton>
         </Box>
-        {notes?.map((note, index) => {
+        {userNotes?.map((note, index) => {
           return (
             <span key={index}>
               <ListItem

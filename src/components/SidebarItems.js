@@ -1,6 +1,6 @@
 import React from "react";
 import { List, ListItem, ListItemText, ListItemIcon, } from "@mui/material";
-import { Dashboard, Pets, Task, Storage, Assessment } from "@mui/icons-material";
+import { Dashboard, Pets, Storage, Assessment } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +12,6 @@ const SidebarItems = ({ handleRouteChange }) => {
       {[
         { text: t('dashboard'), icon: <Dashboard />, path: "/" },
         { text: t('animals'), icon: <Pets />, path: "/animals" },
-        { text: t('tasks'), icon: <Task />, path: "/tasks" },
         { text: t('stocks'), icon: <Storage />, path: "/stocks" },
         { text: t('reports'), icon: <Assessment />, path: "/reports" },
       ].map((item) => (

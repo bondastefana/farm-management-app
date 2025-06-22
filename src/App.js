@@ -6,7 +6,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
-import Tasks from "./pages/Tasks";
 import Stocks from "./pages/Stocks";
 import Reports from "./pages/Reports";
 import NotFound from './pages/NotFound';
@@ -15,6 +14,7 @@ import { CssBaseline, Box } from "@mui/material";
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
 import Login from "./pages/Login";
+import { IsAdminProvider } from './contexts/IsAdminContext';
 
 function PrivateRoute({ children }) {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -25,6 +25,14 @@ function AppContent() {
   const [navOpen, setNavOpen] = useState(false);
   const { loading } = useLoading();
   const location = useLocation();
+  const [employees, setEmployees] = React.useState([]);
+
+  React.useEffect(() => {
+    // Fetch employees on mount for IsAdminProvider
+    import('./services/farmService').then(({ fetchEmployees }) => {
+      fetchEmployees().then(setEmployees);
+    });
+  }, []);
 
   const handleNavToggle = () => {
     setNavOpen(!navOpen);
@@ -32,8 +40,15 @@ function AppContent() {
 
   const isLoginPage = location.pathname === "/login";
 
+  // Close nav on login route
+  React.useEffect(() => {
+    if (location.pathname === "/login") {
+      setNavOpen(false);
+    }
+  }, [location.pathname]);
+
   return (
-    <>
+    <IsAdminProvider employees={employees}>
       <CssBaseline />
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         {!isLoginPage && <Navbar handleNavClick={handleNavToggle} />}
@@ -61,20 +76,18 @@ function AppContent() {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/animals" element={<PrivateRoute><Animals /></PrivateRoute>} />
-            <Route path="/tasks" element={<PrivateRoute><Tasks /></PrivateRoute>} />
             <Route path="/stocks" element={<PrivateRoute><Stocks /></PrivateRoute>} />
             <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
             {/* Only protect NotFound for authenticated users, but redirect / to / if authenticated */}
             <Route path="*" element={
               localStorage.getItem('isAuthenticated') === 'true'
-                ? <Navigate to="/" replace />
-                : <PrivateRoute><NotFound /></PrivateRoute>
+                ? <PrivateRoute><NotFound /></PrivateRoute> : <Route path="/login" element={<Login />} />
             } />
           </Routes>
         </Box>
         {!isLoginPage && <Footer />}
       </Box>
-    </>
+    </IsAdminProvider>
   );
 }
 

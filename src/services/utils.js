@@ -11,7 +11,7 @@ export const getFormattedDate = (seconds) => {
   }).format(date)
 };
 
-export function createData(id, animalId, birthDate, age, gender, treatment, observation) {
+export function createData(id, animalId, birthDate, age, gender, treatment, observation, species) {
   return {
     id,
     animalId,
@@ -20,18 +20,19 @@ export function createData(id, animalId, birthDate, age, gender, treatment, obse
     gender,
     treatment,
     observation,
+    species, // always include species
   };
 }
 
 export const generateRows = (animals) => {
   return animals.map((animal, index) => {
-    const { animalId, birthDate, age: toRemove, gender, treatment, observation } = animal;
+    const { animalId, birthDate, age: toRemove, gender, treatment, observation, species } = animal;
     const id = index + 1;
     const displayedBirthDate = getFormattedDate(toUnixTimestamp(birthDate), false);
     const formattedAge = calculateAge(toUnixTimestamp(birthDate));
     const age = translateAgeString(formattedAge);
 
-    return createData(id, animalId, displayedBirthDate, age, gender, treatment, observation);
+    return createData(id, animalId, displayedBirthDate, age, gender, treatment, observation, species || inferSpecies(animal));
   })
 }
 
@@ -129,4 +130,16 @@ export function translateAgeString(ageString) {
 function toUnixTimestamp(dateStr) {
   const date = new Date(dateStr);
   return Math.floor(date.getTime() / 1000);
+}
+
+function inferSpecies(animal) {
+  // Try to infer species from known properties if missing
+  if (animal && animal.species) return animal.species;
+  if (animal && animal.type) {
+    const type = animal.type.toLowerCase();
+    if (type.includes('cow') || type.includes('vaca')) return 'cow';
+    if (type.includes('horse') || type.includes('cal')) return 'horse';
+  }
+  // fallback: undefined
+  return undefined;
 }

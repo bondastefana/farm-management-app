@@ -29,6 +29,9 @@ import { generateRows, getComparator, headCells } from '../services/utils';
 import DeleteAnimalModal from './DeleteAnimalModal';
 import ShowAnimalModal from './ShowAnimalModal';
 import EditAnimalModal from './EditAnimalModal';
+import { useIsAdmin } from '../contexts/IsAdminContext';
+import useAlert from '../hooks/useAlert';
+import { updateAnimal, deleteAnimal } from '../services/farmService';
 
 const emojiMap = {
   'Cai': '🐎',
@@ -42,7 +45,7 @@ const emojiMap = {
 };
 
 function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort } = props;
+  const { order, orderBy, onRequestSort, isAdmin } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -72,7 +75,9 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell align="right" sx={{ fontWeight: 'bold' }}>Stergere</TableCell>
+        {isAdmin && (
+          <TableCell align="right" sx={{ fontWeight: 'bold' }}>{t('actions')}</TableCell>
+        )}
       </TableRow>
     </TableHead>
   );
@@ -99,7 +104,7 @@ function EnhancedTableToolbar(props) {
   );
 }
 
-const AnimalsTable = ({ animals, type, id }) => {
+const AnimalsTable = ({ animals, type, id, refetchAllAnimals }) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [page, setPage] = React.useState(0);
@@ -112,6 +117,9 @@ const AnimalsTable = ({ animals, type, id }) => {
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [rowToEdit, setRowToEdit] = React.useState(null);
   const formattedAnimalsRows = generateRows(animals);
+
+  const isAdmin = useIsAdmin();
+  const { showAlert, AlertComponent } = useAlert();
 
   const handleRequestSort = useCallback((event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -142,10 +150,25 @@ const AnimalsTable = ({ animals, type, id }) => {
     setRowToDelete(null);
   }, []);
 
-  const handleConfirmDelete = useCallback((id) => {
+  const handleConfirmDelete = useCallback(async (rowId) => {
+    if (!rowToDelete) return;
+    const species = rowToDelete.species;
+    const animalId = rowToDelete.animalId;
+    if (!species) {
+      console.error('Unknown species for deleteAnimal:', species, rowToDelete);
+      showAlert(t('delete_animal_error_species_missing'), 'error');
+      setDeleteModalOpen(false);
+      setRowToDelete(null);
+      return;
+    }
+    const result = await deleteAnimal(species, animalId);
     setDeleteModalOpen(false);
     setRowToDelete(null);
-  }, []);
+    if (result && typeof refetchAllAnimals === 'function') {
+      await refetchAllAnimals();
+      showAlert(t('delete_animal_success'), 'success');
+    }
+  }, [rowToDelete, refetchAllAnimals, showAlert]);
 
   const handleOpenShowModal = useCallback((row) => {
     setRowToShow(row);
@@ -167,10 +190,18 @@ const AnimalsTable = ({ animals, type, id }) => {
     setRowToEdit(null);
   }, []);
 
-  const handleSaveEdit = useCallback((editedRow) => {
+  const handleSaveEdit = useCallback(async (editedRow) => {
+    if (!editedRow) return;
+    const species = editedRow.species;
+    const animalId = editedRow.animalId;
+    const result = await updateAnimal(species, animalId, editedRow);
     setEditModalOpen(false);
     setRowToEdit(null);
-  }, []);
+    if (result && typeof refetchAllAnimals === 'function') {
+      await refetchAllAnimals();
+      showAlert(t('edit_animal_success'), 'success');
+    }
+  }, [refetchAllAnimals, showAlert]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -199,6 +230,7 @@ const AnimalsTable = ({ animals, type, id }) => {
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
+                isAdmin={isAdmin}
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
@@ -221,29 +253,31 @@ const AnimalsTable = ({ animals, type, id }) => {
                       <TableCell >{row.treatment}</TableCell>
                       <TableCell >{row.observation}</TableCell>
                       <TableCell align="right">
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                          <IconButton
-                            aria-label="edit"
-                            color="primary"
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleOpenEditModal(row);
-                            }}
-                            sx={{ mr: 1 }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            aria-label="delete"
-                            color="error"
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleOpenDeleteModal(row);
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
+                        {isAdmin && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                            <IconButton
+                              aria-label="edit"
+                              color="primary"
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleOpenEditModal(row);
+                              }}
+                              sx={{ mr: 1 }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              color="error"
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleOpenDeleteModal(row);
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
@@ -293,6 +327,7 @@ const AnimalsTable = ({ animals, type, id }) => {
           row={rowToEdit}
         />
       </Box>
+      {AlertComponent}
     </LocalizationProvider>
   );
 }

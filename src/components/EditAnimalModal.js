@@ -14,6 +14,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { calculateAge, translateAgeString } from '../services/utils';
+import { useTranslation } from 'react-i18next';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
@@ -21,6 +22,7 @@ const GENDER_OPTIONS = [
 ];
 
 const EditAnimalModal = ({ open, onClose, onSave, row }) => {
+  const { t } = useTranslation();
   const [animalId, setAnimalId] = useState('');
   const [birthDate, setBirthDate] = useState(null);
   const [gender, setGender] = useState('');
@@ -72,44 +74,44 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ textAlign: 'center' }}>Edit Animal Info</DialogTitle>
+      <DialogTitle sx={{ textAlign: 'center' }}>{t('edit_animal_modal_title')}</DialogTitle>
       <DialogContent>
         <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 2, background: '#fafafa', display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="ID"
+            label={t('id')}
             value={animalId}
             onChange={e => setAnimalId(e.target.value)}
             fullWidth
             disabled
           />
           <DatePicker
-            label="Birth Date"
+            label={t('birth_date')}
             value={birthDate}
             onChange={setBirthDate}
             format="YYYY-MM-DD"
             slotProps={{ textField: { fullWidth: true } }}
           />
           <TextField
-            label="Age"
+            label={t('age')}
             value={ageValue}
             fullWidth
             disabled
           />
           <TextField
             select
-            label="Gender"
+            label={t('gender')}
             value={gender}
             onChange={e => setGender(e.target.value)}
             fullWidth
           >
             {GENDER_OPTIONS.map(option => (
               <MenuItem key={option.value} value={option.value} selected={gender === option.value}>
-                {option.label}
+                {t(option.value)}
               </MenuItem>
             ))}
           </TextField>
           <TextField
-            label="Treatment"
+            label={t('treatment')}
             value={treatment}
             onChange={e => setTreatment(e.target.value)}
             fullWidth
@@ -117,7 +119,7 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
             minRows={3}
           />
           <TextField
-            label="Observation"
+            label={t('observation')}
             value={observation}
             onChange={e => setObservation(e.target.value)}
             fullWidth
@@ -128,10 +130,10 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
         <Button onClick={onClose} color="inherit" variant="contained">
-          Close
+          {t('close')}
         </Button>
         <Button onClick={handleSave} color="primary" variant="contained">
-          Save
+          {t('save')}
         </Button>
       </DialogActions>
     </Dialog >

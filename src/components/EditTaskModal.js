@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { fetchEmployees } from '../services/farmService';
 import { useLoading } from '../contexts/LoadingContext';
 import { useTranslation } from 'react-i18next';
+import { useIsAdmin } from '../contexts/IsAdminContext';
 
 const EditTaskModal = ({ open, onClose, onSave, task }) => {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
   const [date, setDate] = useState(task?.date ? dayjs.unix(task.date.seconds).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'));
   const [employees, setEmployees] = useState([]);
   const { loading, setLoading } = useLoading();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     if (open) {
@@ -34,7 +36,7 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
       ...task,
       title,
       description,
-      assignee,
+      assignee, // userName only
       completed,
       date: { seconds: Math.floor(new Date(date).getTime() / 1000) },
     });
@@ -57,7 +59,7 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
             onChange={e => setTitle(e.target.value)}
             fullWidth
             required
-            disabled={loading}
+            disabled={!isAdmin || loading}
           />
           <TextField
             label={t('description_task')}
@@ -67,9 +69,9 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
             multiline
             minRows={2}
             required
-            disabled={loading}
+            disabled={!isAdmin || loading}
           />
-          <FormControl fullWidth required disabled={loading}>
+          <FormControl fullWidth required disabled={!isAdmin || loading}>
             <InputLabel id="assignee-label">{t('assignee_task')}</InputLabel>
             <Select
               labelId="assignee-label"
@@ -78,8 +80,8 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
               onChange={e => setAssignee(e.target.value)}
             >
               {employees.map(emp => (
-                <MenuItem key={emp.id} value={`${emp.firstName} ${emp.lastName}`}>
-                  {emp.firstName} {emp.lastName}
+                <MenuItem key={emp.id} value={emp.userName}>
+                  {emp.firstName} {emp.lastName} ({emp.userName})
                 </MenuItem>
               ))}
             </Select>
@@ -92,7 +94,7 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
             fullWidth
             InputLabelProps={{ shrink: true }}
             required
-            disabled={loading}
+            disabled={!isAdmin || loading}
           />
           <FormControlLabel
             control={<Checkbox checked={completed} onChange={e => setCompleted(e.target.checked)} disabled={loading} />}

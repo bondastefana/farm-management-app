@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 import AnimalsTable from "../components/AnimalsTable"
 import AddAnimalForm from "../components/AddAnimalForm";
@@ -7,9 +7,12 @@ import { Grid } from "@mui/material";
 import { useLoading } from '../contexts/LoadingContext';
 import { fetchCows, fetchHorses } from '../services/farmService';
 import { COW, HORSE } from '../services/constants';
+import { useIsAdmin } from '../contexts/IsAdminContext';
 
 const Livestock = () => {
+  const { t } = useTranslation();
   const { setLoading } = useLoading();
+  const isAdmin = useIsAdmin();
   const [cows, setCows] = useState([]);
   const [horses, setHorses] = useState([]);
 
@@ -45,9 +48,9 @@ const Livestock = () => {
 
   return (
     <Grid container spacing={2}>
-      <AddAnimalForm refetchAllAnimals={fetchAllAnimals} />
-      <AnimalsTable animals={horses} type={t('horses')} id={t('horse')} />
-      <AnimalsTable animals={cows} type={t('cows')} id={t('cow')} />
+      {isAdmin && <AddAnimalForm refetchAllAnimals={fetchAllAnimals} />}
+      <AnimalsTable animals={horses} type={t('horses')} id={t('horse')} refetchAllAnimals={fetchAllAnimals} />
+      <AnimalsTable animals={cows} type={t('cows')} id={t('cow')} refetchAllAnimals={fetchAllAnimals} />
     </Grid>
 
   )

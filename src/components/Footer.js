@@ -5,13 +5,12 @@ import { Link as RouterLink } from "react-router-dom";
 const routes = [
   { path: "/", label: "Dashboard" },
   { path: "/animals", label: "Animals" },
-  { path: "/tasks", label: "Tasks" },
   { path: "/stocks", label: "Stocks" },
   { path: "/reports", label: "Reports" },
 ];
 
-const firstCol = routes.slice(0, 3);
-const secondCol = routes.slice(3);
+const firstCol = routes.slice(0, 2);
+const secondCol = routes.slice(2, 4);
 
 const Footer = () => (
   <Box

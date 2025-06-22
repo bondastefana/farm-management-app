@@ -44,7 +44,6 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
             <ArrowBackIosNewIcon />
           </IconButton>
         </Box>
-
         <SidebarItems handleRouteChange={handleNavToggle} />
       </Grid>
     )
@@ -53,9 +52,10 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
 
   return (
     <Drawer
-      variant={isMobile && "temporary"} // Temporary for mobile, permanent for desktop
+      variant={isMobile && "temporary"}
       open={navOpen}
       onClose={handleNavToggle}
+      ModalProps={isMobile ? { keepMounted: true } : {}}
     >
       {drawerContent}
       <Box display="flex" justifyContent="flex-end" flexDirection="column">
