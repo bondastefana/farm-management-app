@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import './index.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import CircularProgress from '@mui/material/CircularProgress';
 import Sidebar from "./components/Sidebar";
@@ -14,20 +14,24 @@ import { CssBaseline, Box } from "@mui/material";
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
+import Login from "./pages/Login";
 
-function App() {
+function AppContent() {
   const [navOpen, setNavOpen] = useState(false);
   const { loading } = useLoading();
+  const location = useLocation();
 
   const handleNavToggle = () => {
     setNavOpen(!navOpen);
   };
 
+  const isLoginPage = location.pathname === "/login";
+
   return (
-    <Router>
+    <>
       <CssBaseline />
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Navbar handleNavClick={handleNavToggle} />
+        {!isLoginPage && <Navbar handleNavClick={handleNavToggle} />}
         {loading && (
           <Box
             sx={{
@@ -46,10 +50,11 @@ function App() {
             <CircularProgress size={60} />
           </Box>
         )}
-        <Sidebar navOpen={navOpen} handleNavToggle={handleNavToggle} />
-        <Box component="main" sx={{ width: '100%', marginTop: '64px', flex: 1 }} p={2}>
+        {!isLoginPage && <Sidebar navOpen={navOpen} handleNavToggle={handleNavToggle} />}
+        <Box component="main" sx={{ width: '100%', marginTop: !isLoginPage ? '64px' : 0, flex: 1 }} p={isLoginPage ? 0 : 2}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/stocks" element={<Stocks />} />
@@ -57,11 +62,20 @@ function App() {
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>
         </Box>
-        <Footer />
+        {!isLoginPage && <Footer />}
       </Box>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
+
 export default function WrappedApp() {
   return (
     <LoadingProvider>

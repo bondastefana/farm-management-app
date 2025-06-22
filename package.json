@@ -1,5 +1,6 @@
 {
   "name": "farm-manager",
+  "homepage": "https: //bondastefana.github.io/farm-management-app/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -31,7 +32,6 @@
     "recharts": "^2.15.4",
     "web-vitals": "^2.1.4"
   },
-  "homepage": "https: //bondastefana.github.io/farm-management-app/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

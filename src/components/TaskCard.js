@@ -16,7 +16,7 @@ const TaskCard = ({ task, onUpdate, onDelete }) => {
           <Typography variant="body2">
             {task.completed ? 'Completed' : 'Pending'}
           </Typography>
-          <Button variant="outlined" onClick={handleToggleComplete}>
+          <Button variant="contained" onClick={handleToggleComplete}>
             {task.completed ? 'Mark as Pending' : 'Mark as Completed'}
           </Button>
         </Box>

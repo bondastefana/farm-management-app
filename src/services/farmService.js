@@ -16,9 +16,11 @@ import { COW_RO } from './constants';
 export const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const notesCollectionRef = collection(db, 'notes');
+const tasksCollectionRef = collection(db, 'tasks');
 const usersCollectionRef = collection(db, 'users');
 const cowsCollectionRef = collection(db, 'livestock', 'animalsInfo', 'cow');
 const horseCollectionRef = collection(db, 'livestock', 'animalsInfo', 'horse');
+const authCollectionRef = collection(db, 'authentication');
 
 export const getDayName = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -30,19 +32,26 @@ export const formatDate = (timestamp) => {
   return new Date(timestamp * 1000).toLocaleDateString();
 };
 
-export const getWeatherIcon = (condition) => {
+export const getWeatherIcon = (condition, size = 'large') => {
+  let iconProps = { fontSize: size };
+  let style = {};
   switch (condition) {
     case "Clear":
-      return <WbSunny />;
+      style = { fill: '#FFD600' }; // yellow
+      return <WbSunny {...iconProps} style={style} />;
     case "Clouds":
-      return <Cloud />;
+      style = { fill: '#90A4AE' }; // blue-grey
+      return <Cloud {...iconProps} style={style} />;
     case "Rain":
     case "Drizzle":
-      return <CloudySnowing />;
+      style = { fill: '#2196F3' }; // blue
+      return <CloudySnowing {...iconProps} style={style} />;
     case "Thunderstorm":
-      return <Thunderstorm />;
+      style = { fill: '#673AB7' }; // deep purple
+      return <Thunderstorm {...iconProps} style={style} />;
     case "Snow":
-      return <AcUnit />;
+      style = { fill: '#B3E5FC' }; // light blue
+      return <AcUnit {...iconProps} style={style} />;
     case "Mist":
     case "Smoke":
     case "Haze":
@@ -52,11 +61,14 @@ export const getWeatherIcon = (condition) => {
     case "Ash":
     case "Squall":
     case "Tornado":
-      return <FilterDrama />;
+      style = { fill: '#B0BEC5' }; // grey
+      return <FilterDrama {...iconProps} style={style} />;
     case "Night":
-      return <NightsStay />;
+      style = { fill: '#263238' }; // dark blue-grey
+      return <NightsStay {...iconProps} style={style} />;
     default:
-      return <WbSunny />;
+      style = { fill: '#FFD600' };
+      return <WbSunny {...iconProps} style={style} />;
   }
 };
 
@@ -135,6 +147,20 @@ export const fetchNotes = async () => {
   }
 };
 
+export const fetchTasks = async () => {
+  try {
+    const snapshot = await getDocs(tasksCollectionRef);
+    const tasks = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return tasks;
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    return [];
+  }
+};
+
 // Add a new note
 export const addNote = async (note) => {
   try {
@@ -175,5 +201,59 @@ export const saveNote = async (note) => {
     await setDoc(doc(db, "dashboard", "notes"), { content: note });
   } catch (error) {
     console.error("Error saving note:", error);
+  }
+};
+
+export const addTask = async (task) => {
+  try {
+    await addDoc(tasksCollectionRef, task);
+    return true;
+  } catch (error) {
+    console.error("Error adding task:", error);
+    return false;
+  }
+};
+
+export const updateTask = async (taskId, updatedData) => {
+  try {
+    const taskDoc = doc(db, "tasks", taskId);
+    await updateDoc(taskDoc, updatedData);
+    return true;
+  } catch (error) {
+    console.error("Error updating task:", error);
+    return false;
+  }
+};
+
+export const deleteTask = async (taskId) => {
+  try {
+    const taskDoc = doc(db, "tasks", taskId);
+    await deleteDoc(taskDoc);
+    return true;
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return false;
+  }
+};
+
+export const authenticateUser = async (username, password) => {
+  try {
+    const snapshot = await getDocs(authCollectionRef);
+    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const user = users.find(u => (u.userName === username) && u.password === password);
+    if (user) {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('authUser', JSON.stringify({ id: user.id, username: user.userName, firstName: user.firstName, lastName: user.lastName }));
+      return true;
+    } else {
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('authUser');
+      return false;
+    }
+  } catch (error) {
+    console.error('Error authenticating user:', error);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('authUser');
+    return false;
   }
 };

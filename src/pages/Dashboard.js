@@ -8,9 +8,10 @@ import Weather from "../components/Weather";
 import Notes from '../components/Notes';
 import Employees from '../components/Employees';
 import FarmInfo from "../components/FarmInfo"
+import TasksInfo from '../components/TasksInfo';
 import { useLoading } from '../contexts/LoadingContext';
 
-import { fetchNotes, fetchEmployees } from '../services/farmService';
+import { fetchNotes, fetchEmployees, fetchTasks } from '../services/farmService';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const Dashboard = () => {
   });
   const [notes, setNotes] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   const fetchFarmInfo = React.useCallback(async () => {
     const docRef = doc(db, "dashboard", "farmInfo");
@@ -48,6 +50,12 @@ const Dashboard = () => {
     setEmployees(sortedEmployees);
   }, [])
 
+  const fetchTasksInfo = React.useCallback(async () => {
+    const tasksDetail = await fetchTasks();
+    const sortedTasks = tasksDetail.sort((a, b) => b.date.seconds - a.date.seconds)
+    setTasks(sortedTasks);
+  }, [])
+
   const fetchAllData = React.useCallback(async () => {
     setLoading(true);
 
@@ -56,13 +64,13 @@ const Dashboard = () => {
         fetchFarmInfo(),
         fetchNotesInfo(),
         fetchEmployeesInfo(),
+        fetchTasksInfo(),
       ]);
       setLoading(false);
     } catch (error) {
       setLoading(false);
     }
-  }, [fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo, setLoading])
-
+  }, [fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo, fetchTasksInfo, setLoading])
 
   useEffect(() => {
     // Fetch user's location for weather
@@ -90,10 +98,10 @@ const Dashboard = () => {
         <Employees employees={employees} fetchNotesInfo={fetchEmployeesInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
-        <FarmInfo farmInfo={farmInfo} />
+        <FarmInfo farmInfo={{ ...farmInfo, employeesNumber: employees.length }} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <Weather location={location} />
+        <TasksInfo tasks={tasks} fetchTasksInfo={fetchTasksInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <Weather location={location} />

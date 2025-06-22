@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -58,7 +58,7 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
     ageValue = row.age;
   }
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     onSave({
       ...row,
       animalId,
@@ -68,7 +68,7 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
       treatment,
       observation,
     });
-  };
+  }, [onSave, row, animalId, birthDate, ageValue, gender, treatment, observation]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -127,14 +127,14 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
         </Box>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
-        <Button onClick={onClose} color="inherit">
+        <Button onClick={onClose} color="inherit" variant="contained">
           Close
         </Button>
         <Button onClick={handleSave} color="primary" variant="contained">
           Save
         </Button>
       </DialogActions>
-    </Dialog>
+    </Dialog >
   );
 };
 

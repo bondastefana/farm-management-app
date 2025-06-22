@@ -19,7 +19,7 @@ const useAlert = () => {
   const AlertComponent = (
     <Snackbar
       open={open}
-      autoHideDuration={3000}
+      autoHideDuration={6000}
       onClose={closeAlert}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >

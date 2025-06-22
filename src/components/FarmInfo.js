@@ -1,14 +1,14 @@
 import React from "react";
-import { Typography, Card, CardContent, Box } from "@mui/material";
+import { Typography, Paper, CardContent, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-const FarmInfo = ({ farmInfo = [], fetchFarmInfo }) => {
+const FarmInfo = ({ farmInfo = {} }) => {
   const { name, location, size, owner, established, description, employeesNumber } = farmInfo;
   const { t } = useTranslation(); // 't' is the translation function
   return (
-    <Card
+    <Paper
       sx={{
-        p: 3,
+        p: 2,
         maxHeight: 300,
         minHeight: 300,
         overflow: 'auto',
@@ -34,27 +34,28 @@ const FarmInfo = ({ farmInfo = [], fetchFarmInfo }) => {
           >
             {name}
           </Typography>
+          <Box component="span" sx={{ fontSize: 22, ml: 1 }} role="img" aria-label="farm">🌾</Box>
         </Box>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('location')}: </strong> {location}
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('location')}: </strong> {location} <span role="img" aria-label="location">📍</span>
         </Typography>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('size')}: </strong> {size}+
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('size')}: </strong> {size}+ <span role="img" aria-label="size">📏</span>
         </Typography>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('owner')}: </strong> {owner}
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('owner')}: </strong> {owner} <span role="img" aria-label="owner">👤</span>
         </Typography>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('establishment')}: </strong> {established}
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('establishment')}: </strong> {established} <span role="img" aria-label="established">🏛️</span>
         </Typography>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('employeesNumber')}: </strong> {employeesNumber}
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('employeesNumber')}: </strong> {employeesNumber} <span role="img" aria-label="employees">🧑‍🌾</span>
         </Typography>
-        <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
-          <strong>{t('description')}: </strong> {description}
+        <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', mb: 0.3 }}>
+          <strong>{t('description')}: </strong> {description} <span role="img" aria-label="desc">✨</span>
         </Typography>
       </CardContent>
-    </Card>
+    </Paper>
   )
 }
 

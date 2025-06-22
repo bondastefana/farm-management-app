@@ -7,12 +7,13 @@ import {
   Paper,
   ListItemText,
   Box,
-  Divider
+  Divider,
+  Tooltip
 } from "@mui/material";
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeIcon from '@mui/icons-material/Mode';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import AddIcon from '@mui/icons-material/Add';
 import { useLoading } from '../contexts/LoadingContext';
 import { deleteNote, updateNote, addNote } from "../services/farmService";
 import { getFormattedDate } from '../services/utils';
@@ -120,7 +121,7 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
             {t('notes')}
           </Typography>
           <IconButton onClick={handleAddNote} >
-            <PlaylistAddIcon />
+            <AddIcon />
           </IconButton>
         </Box>
         {notes?.map((note, index) => {
@@ -137,18 +138,6 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
               >
                 <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                   <Typography
-                    variant="body1"
-                    noWrap
-                    sx={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      width: '100%',
-                      display: 'block',
-                    }}
-                  >
-                    {note.content}
-                  </Typography>
-                  <Typography
                     variant="caption"
                     color="text.secondary"
                     noWrap
@@ -161,14 +150,22 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
                   >
                     {getFormattedDate(note.date.seconds)}
                   </Typography>
+                  <Tooltip title={note.content} placement="top" arrow>
+                    <Typography
+                      variant="body1"
+                      noWrap
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: '100%',
+                        display: 'block',
+                      }}
+                    >
+                      {note.content}
+                    </Typography>
+                  </Tooltip>
                 </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexShrink: 0 }}>
                   <IconButton
                     sx={{ marginRight: 1 }}
                     edge="end"

@@ -1,13 +1,11 @@
 import i18n from '../i18n';
 
-export const getFormattedDate = (seconds, showHours = true) => {
+export const getFormattedDate = (seconds) => {
   const date = new Date(seconds * 1000);
   return new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-    ...(showHours && ({ hour: '2-digit' })),
-    ...(showHours && ({ minute: '2-digit' })),
     hour12: false,
     timeZone: 'Europe/Bucharest'
   }).format(date)

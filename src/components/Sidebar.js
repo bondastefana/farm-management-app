@@ -1,27 +1,30 @@
 import React from "react";
 import { Drawer, Divider, Avatar, Button, Box, Typography, IconButton, Grid } from "@mui/material";
-
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { useNavigate } from 'react-router-dom';
 
 import SidebarItems from './SidebarItems';
 
 
 const Sidebar = ({ navOpen, handleNavToggle }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect mobile
-  const { t } = useTranslation(); // 't' is the translation function
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
-
+  const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
   const user = {
-    name: "John Doe",
-    avatar: "https://via.placeholder.com/50", // Replace with actual profile image URL
+    name: authUser.firstName && authUser.lastName ? `${authUser.firstName} ${authUser.lastName}` : (authUser.username || 'User'),
+    avatar: authUser.avatar || "https://via.placeholder.com/50",
   };
 
-  const handleLogout = () => {
-    // alert("Logging out...");
-  };
+  const handleLogout = React.useCallback(() => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('authUser');
+    navigate('/login');
+  }, [navigate]);
 
   const drawerContent = React.useMemo(() => {
     return (

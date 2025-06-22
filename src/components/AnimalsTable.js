@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useCallback } from 'react';
 import { t } from 'i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -28,6 +29,17 @@ import { generateRows, getComparator, headCells } from '../services/utils';
 import DeleteAnimalModal from './DeleteAnimalModal';
 import ShowAnimalModal from './ShowAnimalModal';
 import EditAnimalModal from './EditAnimalModal';
+
+const emojiMap = {
+  'Cai': '🐎',
+  'Vaci': '🐄',
+  'Horses': '🐎',
+  'Cows': '🐄',
+  'cal': '🐎',
+  'vaca': '🐄',
+  'cow': '🐄',
+  'horse': '🐎',
+};
 
 function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort } = props;
@@ -67,7 +79,7 @@ function EnhancedTableHead(props) {
 }
 
 function EnhancedTableToolbar(props) {
-  const { type } = props;
+  const { type, emoji } = props;
   return (
     <Toolbar
       sx={{
@@ -81,7 +93,7 @@ function EnhancedTableToolbar(props) {
         id="tableTitle"
         component="div"
       >
-        {type}
+        {type} {emoji && <span style={{ marginLeft: 8, fontSize: 28 }}>{emoji}</span>}
       </Typography>
     </Toolbar>
   );
@@ -101,66 +113,64 @@ const AnimalsTable = ({ animals, type, id }) => {
   const [rowToEdit, setRowToEdit] = React.useState(null);
   const formattedAnimalsRows = generateRows(animals);
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = useCallback((event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
+  }, [order, orderBy]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage);
-  };
+  }, []);
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = useCallback((event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+  }, []);
 
-  const handleChangeDense = (event) => {
+  const handleChangeDense = useCallback((event) => {
     setDense(event.target.checked);
-  };
+  }, []);
 
-  const handleOpenDeleteModal = (row) => {
+  const handleOpenDeleteModal = useCallback((row) => {
     setRowToDelete(row);
     setDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseDeleteModal = () => {
+  const handleCloseDeleteModal = useCallback(() => {
     setDeleteModalOpen(false);
     setRowToDelete(null);
-  };
+  }, []);
 
-  const handleConfirmDelete = (id) => {
-    // Empty function for now
+  const handleConfirmDelete = useCallback((id) => {
     setDeleteModalOpen(false);
     setRowToDelete(null);
-  };
+  }, []);
 
-  const handleOpenShowModal = (row) => {
+  const handleOpenShowModal = useCallback((row) => {
     setRowToShow(row);
     setShowModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseShowModal = () => {
+  const handleCloseShowModal = useCallback(() => {
     setShowModalOpen(false);
     setRowToShow(null);
-  };
+  }, []);
 
-  const handleOpenEditModal = (row) => {
+  const handleOpenEditModal = useCallback((row) => {
     setRowToEdit(row);
     setEditModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = useCallback(() => {
     setEditModalOpen(false);
     setRowToEdit(null);
-  };
+  }, []);
 
-  const handleSaveEdit = (editedRow) => {
-    // Add your save logic here (e.g., update state or call API)
+  const handleSaveEdit = useCallback((editedRow) => {
     setEditModalOpen(false);
     setRowToEdit(null);
-  };
+  }, []);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -178,7 +188,7 @@ const AnimalsTable = ({ animals, type, id }) => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ width: '100%', mb: 2 }} id={id}>
         <Paper sx={{ width: '100%', mb: 2, pr: 2, pl: 2 }}>
-          <EnhancedTableToolbar type={type} />
+          <EnhancedTableToolbar type={type} emoji={emojiMap[type] || ''} />
           <TableContainer>
             <Table
               sx={{ minWidth: 750 }}

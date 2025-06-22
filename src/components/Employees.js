@@ -11,8 +11,8 @@ import {
   ListItemIcon
 } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AddIcon from '@mui/icons-material/Add';
 
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useLoading } from '../contexts/LoadingContext';
 import { getFormattedDate } from '../services/utils';
 
@@ -62,7 +62,7 @@ const Notes = ({ employees = [], fetchNotesInfo }) => {
             {t('employees')}
           </Typography>
           <IconButton onClick={handleAddEmployee} >
-            <PlaylistAddIcon />
+            <AddIcon />
           </IconButton>
         </Box>
         {employees?.map((employee, index) => {
