@@ -1,6 +1,6 @@
 {
   "name": "farm-manager",
-  "homepage": "https: //bondastefana.github.io/farm-management-app/",
+  "homepage": "https://bondastefana.github.io/farm-management-app/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
