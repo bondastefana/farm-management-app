@@ -88,9 +88,9 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
 
   return (
     <Paper sx={{ mb: 3, p: 2 }} elevation={3}>
-      <Typography variant="h6" gutterBottom>{title} {emoji && <span style={{ fontSize: 24, marginLeft: 8 }}>{emoji}</span>}</Typography>
-      <TableContainer>
-        <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
+      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: 16, sm: 20 } }}>{title} {emoji && <span style={{ fontSize: 24, marginLeft: 8 }}>{emoji}</span>}</Typography>
+      <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
+        <Table sx={{ tableLayout: { xs: 'auto', sm: 'fixed' }, minWidth: 600 }}>
           <TableHead>
             <TableRow>
               {localizedHeadCells.map((headCell, idx) => (
@@ -100,12 +100,14 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
                   sortDirection={orderBy === headCell.id ? order : false}
                   sx={{
                     fontWeight: idx === 0 ? 'bold' : undefined,
+                    fontSize: { xs: 12, sm: 14 },
+                    px: { xs: 1, sm: 2 },
                     width:
-                      headCell.id === 'name' ? '20%' :
-                        headCell.id === 'quantity' ? '20%' :
-                          headCell.id === 'lastModifiedDate' ? '20%' :
-                            headCell.id === 'observation' ? '30%' :
-                              headCell.id === 'actions' ? '10%' : undefined,
+                      headCell.id === 'name' ? { xs: 'auto', sm: '20%' } :
+                        headCell.id === 'quantity' ? { xs: 'auto', sm: '20%' } :
+                          headCell.id === 'lastModifiedDate' ? { xs: 'auto', sm: '20%' } :
+                            headCell.id === 'observation' ? { xs: 'auto', sm: '30%' } :
+                              headCell.id === 'actions' ? { xs: 'auto', sm: '10%' } : undefined,
                     minWidth: headCell.id === 'actions' ? 48 : undefined
                   }}
                 >
@@ -131,11 +133,11 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
             {paginatedRows.length > 0 ? (
               paginatedRows.map((row, idx) => (
                 <TableRow key={row.id || idx} hover>
-                  <TableCell sx={{ width: '20%' }}>{row.name || '-'}</TableCell>
-                  <TableCell sx={{ width: '20%' }}>{row.quantity || '-'}</TableCell>
-                  <TableCell sx={{ width: '20%' }}>{formatDate(row.lastModifiedDate)}</TableCell>
-                  <TableCell sx={{ width: '30%', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.observation || '-'}</TableCell>
-                  <TableCell align="center" sx={{ width: '10%', minWidth: 48 }}>
+                  <TableCell sx={{ width: { xs: 'auto', sm: '20%' }, fontSize: { xs: 12, sm: 14 }, px: { xs: 1, sm: 2 } }}>{row.name || '-'}</TableCell>
+                  <TableCell sx={{ width: { xs: 'auto', sm: '20%' }, fontSize: { xs: 12, sm: 14 }, px: { xs: 1, sm: 2 } }}>{row.quantity || '-'}</TableCell>
+                  <TableCell sx={{ width: { xs: 'auto', sm: '20%' }, fontSize: { xs: 12, sm: 14 }, px: { xs: 1, sm: 2 } }}>{formatDate(row.lastModifiedDate)}</TableCell>
+                  <TableCell sx={{ width: { xs: 'auto', sm: '30%' }, maxWidth: { xs: 100, sm: 180 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: { xs: 'normal', sm: 'nowrap' }, fontSize: { xs: 12, sm: 14 }, px: { xs: 1, sm: 2 } }}>{row.observation || '-'}</TableCell>
+                  <TableCell align="center" sx={{ width: { xs: 'auto', sm: '10%' }, minWidth: 48, fontSize: { xs: 12, sm: 14 }, px: { xs: 1, sm: 2 } }}>
                     <IconButton color="primary" onClick={e => { e.stopPropagation(); onEdit(row, title, emoji); }} aria-label={t('foodStock.editAria', { name: row.name || '' })}>
                       <EditIcon />
                     </IconButton>
@@ -144,7 +146,7 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center">{t('foodStock.noData')}</TableCell>
+                <TableCell colSpan={5} align="center" sx={{ fontSize: { xs: 12, sm: 14 } }}>{t('foodStock.noData')}</TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -160,6 +162,7 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t('foodStock.rowsPerPage')}
+          sx={{ '.MuiTablePagination-toolbar': { flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' } }, fontSize: { xs: 12, sm: 14 } }}
         />
       </Box>
     </Paper>

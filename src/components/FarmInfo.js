@@ -21,6 +21,9 @@ const FarmInfo = ({ farmInfo = {} }) => {
         pr: 'calc(24px / 2)',
         display: 'flex',
         flexDirection: 'column',
+        pt: 0,
+        pb: 3,
+        px: 2,
       }}
       elevation={3}
     >
@@ -31,6 +34,11 @@ const FarmInfo = ({ farmInfo = {} }) => {
             justifyContent: 'center',
             alignItems: 'center',
             mb: 2,
+            position: 'sticky',
+            top: 0,
+            zIndex: 99,
+            pb: 1,
+            backgroundColor: 'inherit',
           }}
         >
           <Typography

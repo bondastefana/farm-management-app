@@ -122,12 +122,20 @@ const Notes = ({ employees = [], fetchNotesInfo }) => {
           maxHeight: 300,
           minHeight: 300,
           overflow: 'auto',
+          pt: 0,
+          pb: 3,
+          px: 2,
         }}>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: 99,
+            pb: 1,
+            backgroundColor: 'inherit',
           }}  >
           <Typography
             align="center"

@@ -91,12 +91,26 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
 
   return (
     <>
-      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 4, minHeight: 320, maxHeight: 638, overflowY: 'auto' }}>
+      <Paper sx={{
+        borderRadius: 3,
+        boxShadow: 4,
+        minHeight: 500,
+        maxHeight: 500,
+        overflowY: 'auto',
+        pt: 0,
+        pb: 3,
+        px: 2,
+      }}>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: 99,
+            pb: 1,
+            backgroundColor: 'inherit',
           }}
         >
           <Typography

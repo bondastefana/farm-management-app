@@ -117,7 +117,7 @@ const Reports = () => {
       <TinyBarChart
         key={type.id}
         data={chartData}
-        title={type.label}
+        title={`${type.label} (${t('kg')})`}
         emoji={type.emoji}
       />
     );

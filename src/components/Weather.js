@@ -102,9 +102,14 @@ const Weather = ({ location }) => {
     <Paper
       elevation={3}
       sx={{
-        padding: 3
+        pt: 0,
+        pb: 3,
+        px: 2,
+        minHeight: 500,
+        maxHeight: 500,
+        overflowY: 'auto',
       }}>
-      <Typography align="center" variant="h4" mb={1}>{t('weather')} {city}</Typography>
+      <Typography align="center" variant="h4" mb={2}>{t('weather')} {city}</Typography>
       {/* Current Weather */}
       {weatherData ? (
         <Grid container
