@@ -16,36 +16,46 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif', // Default font
+    fontFamily: 'Merriweather, Roboto, Arial, sans-serif', // Farm-appropriate, elegant serif for headings
     h1: {
-      color: primaryTextColor, // Use secondary color for headings
+      color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     h2: {
       color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     h3: {
       color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     h4: {
       color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     h5: {
       color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     h6: {
       color: primaryTextColor,
+      fontFamily: 'Merriweather, serif',
     },
     body1: {
-      color: primaryTextColor, // Use secondary color for body text
+      color: primaryTextColor,
+      fontFamily: 'Roboto, Arial, sans-serif',
     },
     body2: {
       color: primaryTextColor,
+      fontFamily: 'Roboto, Arial, sans-serif',
     },
     subtitle1: {
       color: primaryTextColor,
+      fontFamily: 'Roboto, Arial, sans-serif',
     },
     subtitle2: {
       color: primaryTextColor,
+      fontFamily: 'Roboto, Arial, sans-serif',
     },
   },
   components: {
