@@ -26,7 +26,7 @@ export function createData(id, animalId, birthDate, age, gender, treatment, obse
 
 export const generateRows = (animals) => {
   return animals.map((animal, index) => {
-    const { animalId, birthDate, age: toRemove, gender, treatment, observation, species } = animal;
+    const { animalId, birthDate, gender, treatment, observation, species } = animal;
     const id = index + 1;
     const displayedBirthDate = getFormattedDate(toUnixTimestamp(birthDate), false);
     const formattedAge = calculateAge(toUnixTimestamp(birthDate));

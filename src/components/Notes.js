@@ -5,7 +5,6 @@ import {
   ListItem,
   IconButton,
   Paper,
-  ListItemText,
   Box,
   Divider,
   Tooltip

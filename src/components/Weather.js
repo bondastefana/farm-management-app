@@ -1,15 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Paper,
-} from "@mui/material";
+import React, { useEffect, useState, useCallback } from "react";
+import { Typography } from "@mui/material";
 
-import { getDayName, formatDate, getWeatherIcon } from '../services/farmService';
+import { formatDate } from '../services/farmService';
 import { WEATHER_API_KEY, GOOGLE_API_KEY } from '../services/constants';
 import WeatherCard from './WeatherCard';
 
