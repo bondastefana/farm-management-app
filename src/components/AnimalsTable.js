@@ -31,7 +31,7 @@ import { useIsAdmin } from '../contexts/IsAdminContext';
 import useAlert from '../hooks/useAlert';
 import { updateAnimal, deleteAnimal } from '../services/farmService';
 
-const emojiMap = {
+export const emojiMap = {
   'Cai': '🐎',
   'Vaci': '🐄',
   'Horses': '🐎',

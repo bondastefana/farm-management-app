@@ -119,7 +119,7 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
             </Typography>
           )}
           {allTasks.map((task) => (
-            <ListItem key={task.id} alignItems="center" sx={{ mb: 1, borderRadius: 2, bgcolor: task.completed ? 'success.lighter' : 'warning.lighter', boxShadow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 0 }}>
+            <ListItem key={task.id} alignItems="center" sx={{ mb: 1, borderRadius: 2, bgcolor: '#fff', boxShadow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 0 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2 }}>
                 <ListItemIcon sx={{ minWidth: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', pl: 2 }}>
                   {task.completed ? (

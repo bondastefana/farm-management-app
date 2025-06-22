@@ -4,6 +4,7 @@ import { useTheme, useMediaQuery } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import SidebarItems from './SidebarItems';
 
@@ -16,8 +17,8 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
 
   const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
   const user = {
-    name: authUser.firstName && authUser.lastName ? `${authUser.firstName} ${authUser.lastName}` : (authUser.username || 'User'),
-    avatar: authUser.avatar || "https://via.placeholder.com/50",
+    name: authUser.firstName && authUser.lastName ? `${authUser.firstName} ${authUser.lastName}` : (authUser.username || t('user')),
+    avatar: authUser.avatar || null,
   };
 
   const handleLogout = React.useCallback(() => {
@@ -61,7 +62,11 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
       <Box display="flex" justifyContent="flex-end" flexDirection="column">
         <Divider variant="middle" />
         <Box display="flex" alignItems="center" flexDirection="column" p={2}>
-          <Avatar src={user.avatar} />
+          {user.avatar ? (
+            <Avatar src={user.avatar} />
+          ) : (
+            <AccountCircleIcon fontSize="large" sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+          )}
           <Typography variant="subtitle1">{user.name}</Typography>
           <Button variant="contained" color="error" size="small" onClick={handleLogout}>
             {t('logOut')}

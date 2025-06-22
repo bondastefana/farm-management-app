@@ -13,7 +13,7 @@ const WeatherCard = ({ weatherData, forecast = null }) => {
   const data = forecast ?? weatherData;
 
   return (
-    <Card>
+    <Card sx={{ backgroundColor: '#fff' }}>
       <CardContent>
         {forecast ?
           (<Typography variant="body1" align="center" sx={{ fontWeight: 'bold' }}>

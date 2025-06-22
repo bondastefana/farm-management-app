@@ -8,7 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
 import Stocks from "./pages/Stocks";
 import Reports from "./pages/Reports";
-import NotFound from './pages/NotFound';
+
 import { CssBaseline, Box } from "@mui/material";
 
 import Navbar from './components/Navbar'
@@ -79,11 +79,7 @@ function AppContent() {
             <Route path="/stocks" element={<PrivateRoute><Stocks /></PrivateRoute>} />
             <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
             {/* Only protect NotFound for authenticated users, but redirect / to / if authenticated */}
-            <Route path="*" element={
-              localStorage.getItem('isAuthenticated') === 'true'
-                ? <PrivateRoute><NotFound /></PrivateRoute>
-                : <Navigate to="/login" replace />
-            } />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Box>
         {!isLoginPage && <Footer />}

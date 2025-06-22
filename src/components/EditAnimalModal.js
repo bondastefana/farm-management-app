@@ -74,7 +74,7 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ textAlign: 'center' }}>{t('edit_animal_modal_title')}</DialogTitle>
       <DialogContent>
-        <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 2, background: '#fafafa', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label={t('id')}
             value={animalId}

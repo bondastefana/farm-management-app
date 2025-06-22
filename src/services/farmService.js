@@ -20,6 +20,7 @@ const usersCollectionRef = collection(db, 'users');
 const cowsCollectionRef = collection(db, 'livestock', 'animalsInfo', 'cow');
 const horseCollectionRef = collection(db, 'livestock', 'animalsInfo', 'horse');
 const authCollectionRef = collection(db, 'authentication');
+const foodStockCollectionRef = collection(db, 'foodstock');
 
 export const getDayName = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -349,6 +350,42 @@ export const deleteAnimal = async (species, animalId) => {
     return true;
   } catch (error) {
     console.error('Error deleting animal:', error);
+    return false;
+  }
+};
+
+// --- Food Stock ---
+export const fetchFoodStock = async () => {
+  try {
+    const snapshot = await getDocs(foodStockCollectionRef);
+    const foodStocks = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return foodStocks;
+  } catch (error) {
+    console.error('Error fetching food stock:', error);
+    return [];
+  }
+};
+
+export const updateFoodStock = async (docId, updatedData) => {
+  try {
+    const foodDoc = doc(db, 'foodstock', docId);
+    await updateDoc(foodDoc, updatedData);
+    return true;
+  } catch (error) {
+    console.error('Error updating food stock:', error);
+    return false;
+  }
+};
+
+export const addFoodStock = async (data) => {
+  try {
+    await addDoc(foodStockCollectionRef, data);
+    return true;
+  } catch (error) {
+    console.error('Error adding food stock:', error);
     return false;
   }
 };

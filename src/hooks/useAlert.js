@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
-const useAlert = () => {
+const useAlert = (duration = 6000) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('success');
@@ -19,7 +19,7 @@ const useAlert = () => {
   const AlertComponent = (
     <Snackbar
       open={open}
-      autoHideDuration={6000}
+      autoHideDuration={duration}
       onClose={closeAlert}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >

@@ -5,14 +5,14 @@ import {
   ListItem,
   IconButton,
   Paper,
+  ListItemText,
   Box,
-  Divider,
-  Tooltip
+  Divider
 } from "@mui/material";
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeIcon from '@mui/icons-material/Mode';
-import AddIcon from '@mui/icons-material/Add';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useLoading } from '../contexts/LoadingContext';
 import { deleteNote, updateNote, addNote } from "../services/farmService";
 import { getFormattedDate } from '../services/utils';
@@ -58,11 +58,10 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
   }, [])
   const handleAddNoteSave = React.useCallback(async (content) => {
     setLoading(true);
-    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     const newNote = {
       content: content,
       date: new Date(Date.now()),
-      userName: authUser.username || ''
+      userId: "admin"
     }
     const isNoteSaved = await addNote(newNote);
     if (isNoteSaved) {
@@ -95,11 +94,6 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
     }
   }, [editedNote, fetchNotesInfo, setLoading, showAlert])
 
-  // Get logged-in username
-  const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
-  const loggedInUsername = authUser.username || '';
-  // Filter notes for logged-in user only
-  const userNotes = notes?.filter(note => note.userName === loggedInUsername);
 
   return (
     <>
@@ -110,7 +104,6 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
           maxHeight: 300,
           minHeight: 300,
           overflow: 'auto',
-          pr: 'calc(24px / 2)', // half default padding if scrollbar is visible
         }}>
         <Box
           sx={{
@@ -126,51 +119,37 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
             {t('notes')}
           </Typography>
           <IconButton onClick={handleAddNote} >
-            <AddIcon />
+            <PlaylistAddIcon />
           </IconButton>
         </Box>
-        {userNotes?.map((note, index) => {
+        {notes?.map((note, index) => {
           return (
             <span key={index}>
-              <ListItem
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  px: 0,
-                }}
-              >
-                <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    noWrap
+              <ListItem>
+                <Box>
+                  <ListItemText
                     sx={{
+                      whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      width: '100%',
-                      display: 'block',
                     }}
-                  >
-                    {getFormattedDate(note.date.seconds)}
-                  </Typography>
-                  <Tooltip title={note.content} placement="top" arrow>
-                    <Typography
-                      variant="body1"
-                      noWrap
-                      sx={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        width: '100%',
-                        display: 'block',
-                      }}
-                    >
-                      {note.content}
-                    </Typography>
-                  </Tooltip>
+                    primary={note.content}
+                  />
+                  <ListItemText
+                    secondary={(getFormattedDate(note.date.seconds))}
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  />
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexShrink: 0 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    width: '100%'
+                  }}>
                   <IconButton
                     sx={{ marginRight: 1 }}
                     edge="end"
@@ -187,8 +166,8 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
                   </IconButton>
                 </Box>
               </ListItem>
-              <Divider sx={{ width: '100%' }} />
-            </span >
+              <Divider variant="middle" />
+            </span>
           )
         })}
       </Paper >

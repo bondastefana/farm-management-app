@@ -96,7 +96,7 @@ const Dashboard = () => {
         <Employees employees={employees} fetchNotesInfo={fetchEmployeesInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
-        <FarmInfo farmInfo={{ ...farmInfo, employeesNumber: employees.length }} />
+        <FarmInfo farmInfo={farmInfo} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <TasksInfo tasks={tasks} fetchTasksInfo={fetchTasksInfo} />

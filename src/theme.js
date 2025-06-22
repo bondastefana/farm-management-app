@@ -97,6 +97,7 @@ const theme = createTheme({
         root: {
           // backgroundColor: mainBodyColor, // Apply secondary color to all icons\
           borderRadius: '16px',
+          backgroundColor: '#f5efe1', // Light background for paper components
         },
       },
     },
@@ -111,6 +112,36 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: primaryColor, // Set the default color to primary
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#fff',
+          border: 'none',
+          borderRadius: '8px',
+        },
+        input: {
+          backgroundColor: '#fff',
+          border: 'none',
+          borderRadius: '8px',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          border: 'none',
+          borderRadius: '8px',
+        },
+        root: {
+          borderRadius: '8px',
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            border: '2px solid',
+            borderColor: primaryColor,
+            borderRadius: '8px',
+          },
         },
       },
     },
