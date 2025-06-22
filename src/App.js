@@ -81,7 +81,8 @@ function AppContent() {
             {/* Only protect NotFound for authenticated users, but redirect / to / if authenticated */}
             <Route path="*" element={
               localStorage.getItem('isAuthenticated') === 'true'
-                ? <PrivateRoute><NotFound /></PrivateRoute> : <Route path="/login" element={<Login />} />
+                ? <PrivateRoute><NotFound /></PrivateRoute>
+                : <Navigate to="/login" replace />
             } />
           </Routes>
         </Box>
