@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/farm-management-app/static/css/main.d64e492e.css",
-    "main.js": "/farm-management-app/static/js/main.86128bc6.js",
+    "main.js": "/farm-management-app/static/js/main.d922d2e5.js",
     "static/js/453.8ae8a102.chunk.js": "/farm-management-app/static/js/453.8ae8a102.chunk.js",
     "index.html": "/farm-management-app/index.html",
     "main.d64e492e.css.map": "/farm-management-app/static/css/main.d64e492e.css.map",
-    "main.86128bc6.js.map": "/farm-management-app/static/js/main.86128bc6.js.map",
+    "main.d922d2e5.js.map": "/farm-management-app/static/js/main.d922d2e5.js.map",
     "453.8ae8a102.chunk.js.map": "/farm-management-app/static/js/453.8ae8a102.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d64e492e.css",
-    "static/js/main.86128bc6.js"
+    "static/js/main.d922d2e5.js"
   ]
 }
