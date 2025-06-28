@@ -140,4 +140,4 @@ const Weather = ({ location }) => {
   );
 };
 
-export default Weather;
+export default React.memo(Weather);

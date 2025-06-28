@@ -34,4 +34,4 @@ const ShowAnimalModal = ({ open, onClose, row }) => {
   );
 };
 
-export default ShowAnimalModal;
+export default React.memo(ShowAnimalModal);

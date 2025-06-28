@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import './index.css';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import CircularProgress from '@mui/material/CircularProgress';
+import { CssBaseline, Box } from "@mui/material";
+
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
 import Stocks from "./pages/Stocks";
-import Reports from "./pages/Reports";
+import Reports from "./pages/Reports"; 
+import Login from "./pages/Login";
 
-import { CssBaseline, Box } from "@mui/material";
+import { fetchEmployees } from './services/farmService';
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
-import Login from "./pages/Login";
+
 import { IsAdminProvider } from './contexts/IsAdminContext';
+
 
 function PrivateRoute({ children }) {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -26,19 +30,16 @@ function AppContent() {
   const { loading } = useLoading();
   const location = useLocation();
   const [employees, setEmployees] = React.useState([]);
+  const isLoginPage = location.pathname === "/login";
+
+  const handleNavToggle = React.useCallback(() => {
+    setNavOpen(!navOpen);
+  }, [navOpen]);
 
   React.useEffect(() => {
     // Fetch employees on mount for IsAdminProvider
-    import('./services/farmService').then(({ fetchEmployees }) => {
-      fetchEmployees().then(setEmployees);
-    });
+    fetchEmployees().then(setEmployees);
   }, []);
-
-  const handleNavToggle = () => {
-    setNavOpen(!navOpen);
-  };
-
-  const isLoginPage = location.pathname === "/login";
 
   // Close nav on login route
   React.useEffect(() => {
@@ -78,7 +79,7 @@ function AppContent() {
             <Route path="/animals" element={<PrivateRoute><Animals /></PrivateRoute>} />
             <Route path="/stocks" element={<PrivateRoute><Stocks /></PrivateRoute>} />
             <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
-            {/* Only protect NotFound for authenticated users, but redirect / to / if authenticated */}
+
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Box>

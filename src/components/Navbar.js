@@ -148,4 +148,4 @@ const Navbar = ({ handleNavClick }) => {
   )
 }
 
-export default Navbar;
+export default React.memo(Navbar);

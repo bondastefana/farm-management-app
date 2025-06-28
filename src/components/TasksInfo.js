@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from "react";
 import { Paper, Typography, List, ListItem, ListItemText, Box, Chip, IconButton } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import { getFormattedDate } from '../services/utils';
+
 import AddTaskModal from './AddTaskModal';
 import EditTaskModal from './EditTaskModal';
 import DeleteTaskModal from './DeleteTaskModal';
-import { addTask, updateTask, deleteTask, fetchTasks } from '../services/farmService';
+import { addTask, updateTask, deleteTask, fetchTasks, formatDate } from '../services/farmService';
 import EditIcon from '@mui/icons-material/Mode';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from "react-i18next";
@@ -164,7 +164,7 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
                           {t('assignee')}: <b>{task.assignee || 'N/A'}</b>
                         </Typography>
                         <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '1rem' }}>
-                          {getFormattedDate(task.date?.seconds || 0)}
+                          📌 {formatDate(task.date?.seconds || 0)}
                         </Typography>
                       </Box>
                     </>
@@ -198,13 +198,13 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
             </ListItem>
           ))}
         </List>
-        <AddTaskModal open={addModalOpen} onClose={handleCloseAddModal} onSave={handleAddTask} />
-        <EditTaskModal open={editModalOpen} onClose={handleCloseEditModal} onSave={handleEditTask} task={taskToEdit} />
-        <DeleteTaskModal open={deleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleDeleteTask} task={taskToDelete} />
+        {addModalOpen && (<AddTaskModal open={addModalOpen} onClose={handleCloseAddModal} onSave={handleAddTask} />)}
+        {editModalOpen && (<EditTaskModal open={editModalOpen} onClose={handleCloseEditModal} onSave={handleEditTask} task={taskToEdit} />)}
+        {deleteModalOpen && (<DeleteTaskModal open={deleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleDeleteTask} task={taskToDelete} />)}
       </Paper>
       {AlertComponent}
     </>
   );
 };
 
-export default TasksInfo;
+export default React.memo(TasksInfo);

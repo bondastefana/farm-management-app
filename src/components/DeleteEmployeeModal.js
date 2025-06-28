@@ -48,4 +48,4 @@ const DeleteEmployeeModal = ({ open, onClose, employee, onSubmit, loading }) => 
   );
 };
 
-export default DeleteEmployeeModal;
+export default React.memo(DeleteEmployeeModal);

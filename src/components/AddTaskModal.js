@@ -122,4 +122,4 @@ const AddTaskModal = ({ open, onClose, onSave }) => {
   );
 };
 
-export default AddTaskModal;
+export default React.memo(AddTaskModal);

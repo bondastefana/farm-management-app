@@ -200,30 +200,30 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
           )
         })}
       </Paper >
-      <DeleteNoteModal
+      {!!deletedNote && (<DeleteNoteModal
         open={!!deletedNote}
         note={deletedNote}
         onClose={handleDeleteClosed}
         onConfirm={handleDeleteConfirm}
         title={t('delete')}
         description={t('deleteNoteModalDescription')}
-      />
-      <EditNoteModal
+      />)}
+      {!!editedNote && (<EditNoteModal
         open={!!editedNote}
         note={editedNote}
         onClose={handleEditClosed}
         onSave={handleEditConfirm}
-      />
-      <AddNoteModal
+      />)}
+      {!!addedNote && (<AddNoteModal
         open={!!addedNote}
         note={addedNote}
         onClose={handleAddNoteClosed}
         onSave={handleAddNoteSave}
-      />
+      />)}
 
       {AlertComponent}
     </>
   );
 };
 
-export default Notes;
+export default React.memo(Notes);

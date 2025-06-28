@@ -1,12 +1,12 @@
-// components/TaskCard.js
-
 import React from 'react';
 import { Card, CardContent, Typography, Button, Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const TaskCard = ({ task, onUpdate, onDelete }) => {
-  const handleToggleComplete = () => {
+  const { t } = useTranslation();
+  const handleToggleComplete = React.useCallback(() => {
     onUpdate(task.id, { ...task, completed: !task.completed });
-  };
+  }, [task, onUpdate]);
 
   return (
     <Card sx={{ padding: 2 }}>
@@ -22,11 +22,11 @@ const TaskCard = ({ task, onUpdate, onDelete }) => {
         </Box>
 
         <Button variant="contained" color="error" sx={{ marginTop: 1 }} onClick={() => onDelete(task.id)}>
-          Delete
+          {t('delete')}
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default TaskCard;
+export default React.memo(TaskCard);

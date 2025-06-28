@@ -66,4 +66,4 @@ const AddNoteModal = ({ open, onClose, note, onSave }) => {
 
 };
 
-export default AddNoteModal;
+export default React.memo(AddNoteModal);

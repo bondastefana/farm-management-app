@@ -169,7 +169,7 @@ function FoodStockTable({ items, title, emoji, onEdit }) {
   );
 }
 
-export default function FoodStockTables({ foodStock, fetchStock }) {
+function FoodStockTables({ foodStock, fetchStock }) {
   const foodTypes = useFoodTypes();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [rowToEdit, setRowToEdit] = useState(null);
@@ -236,3 +236,5 @@ export default function FoodStockTables({ foodStock, fetchStock }) {
     </>
   );
 }
+
+export default React.memo(FoodStockTables);

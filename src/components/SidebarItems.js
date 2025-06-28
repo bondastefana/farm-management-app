@@ -29,4 +29,4 @@ const SidebarItems = ({ handleRouteChange }) => {
     </List>);
 };
 
-export default SidebarItems;
+export default React.memo(SidebarItems);

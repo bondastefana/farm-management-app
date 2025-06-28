@@ -330,4 +330,4 @@ const AnimalsTable = ({ animals, type, id, refetchAllAnimals }) => {
   );
 }
 
-export default AnimalsTable;
+export default React.memo(AnimalsTable);

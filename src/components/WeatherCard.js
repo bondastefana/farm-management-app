@@ -8,9 +8,25 @@ import {
 } from "@mui/material";
 import { getDayName, formatDate, getWeatherIcon } from '../services/farmService';
 
+const descriptionMap = {
+  "clear sky": "weatherDescriptions.clear_sky",
+  "few clouds": "weatherDescriptions.few_clouds",
+  "scattered clouds": "weatherDescriptions.scattered_clouds",
+  "broken clouds": "weatherDescriptions.broken_clouds",
+  "shower rain": "weatherDescriptions.shower_rain",
+  "rain": "weatherDescriptions.rain",
+  "thunderstorm": "weatherDescriptions.thunderstorm",
+  "snow": "weatherDescriptions.snow",
+  "mist": "weatherDescriptions.mist"
+};
+
+
 const WeatherCard = ({ weatherData, forecast = null }) => {
   const { t } = useTranslation();
   const data = forecast ?? weatherData;
+
+  const descriptionKey = descriptionMap[data.weather[0].description?.toLowerCase()];
+  const translatedDescription = descriptionKey ? t(descriptionKey) : data.weather[0].description;
 
   return (
     <Card sx={{ backgroundColor: '#fff' }}>
@@ -30,17 +46,17 @@ const WeatherCard = ({ weatherData, forecast = null }) => {
           </Typography>
         </Box>
         <Typography variant="body2">
-          Weather: {data.weather[0].description}
+          {t('weatherToday')}:  <b>{translatedDescription}</b>
         </Typography>
         <Typography variant="body2">
-          {t('humidity')}: {data.main.humidity}%
+          {t('humidity')}: <b>{data.main.humidity}%</b>
         </Typography>
         <Typography variant="body2">
-          {t('windSpeed')}: {data.wind.speed} m/s
+          {t('windSpeed')}: <b>{data.wind.speed} m/s</b>
         </Typography>
       </CardContent>
     </Card>
   )
 };
 
-export default WeatherCard;
+export default React.memo(WeatherCard);

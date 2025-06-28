@@ -22,7 +22,7 @@ const style = {
   gap: 2,
 };
 
-export default function EditFoodStockModal({ open, onClose, row, onSave }) {
+function EditFoodStockModal({ open, onClose, row, onSave }) {
   const { t } = useTranslation();
   const foodTypes = useFoodTypes();
   const [form, setForm] = useState(row || {});
@@ -166,3 +166,5 @@ export default function EditFoodStockModal({ open, onClose, row, onSave }) {
     </>
   );
 }
+
+export default React.memo(EditFoodStockModal);

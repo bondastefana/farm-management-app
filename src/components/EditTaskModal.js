@@ -115,4 +115,4 @@ const EditTaskModal = ({ open, onClose, onSave, task }) => {
   );
 };
 
-export default EditTaskModal;
+export default React.memo(EditTaskModal);

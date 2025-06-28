@@ -38,4 +38,4 @@ const DeleteNoteModal = ({ open, onClose, onConfirm, title, description, note })
   );
 };
 
-export default DeleteNoteModal;
+export default React.memo(DeleteNoteModal);

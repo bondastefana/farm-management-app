@@ -40,4 +40,4 @@ const DeleteAnimalModal = ({ open, onClose, onConfirm, row }) => {
   );
 };
 
-export default DeleteAnimalModal;
+export default React.memo(DeleteAnimalModal);

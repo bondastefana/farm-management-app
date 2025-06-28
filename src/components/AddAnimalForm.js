@@ -195,4 +195,4 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
   );
 };
 
-export default AddAnimalForm;
+export default React.memo(AddAnimalForm);

@@ -29,7 +29,7 @@ export const getDayName = (timestamp) => {
 };
 
 export const formatDate = (timestamp) => {
-  return new Date(timestamp * 1000).toLocaleDateString();
+  return new Date(timestamp * 1000).toLocaleDateString('ro-RO', {});
 };
 
 export const getWeatherIcon = (condition, size = 'large') => {

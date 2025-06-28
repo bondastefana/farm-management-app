@@ -148,4 +148,4 @@ const AddEmployeeModal = ({ open, onClose, onSuccess }) => {
   );
 };
 
-export default AddEmployeeModal;
+export default React.memo(AddEmployeeModal);

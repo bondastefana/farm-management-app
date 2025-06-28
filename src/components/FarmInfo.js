@@ -78,4 +78,4 @@ const FarmInfo = ({ farmInfo = {} }) => {
   )
 }
 
-export default FarmInfo;
+export default React.memo(FarmInfo);

@@ -7,7 +7,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { getFormattedDate } from "../services/utils";
 
 const EmployeesInfoModal = ({ employee = {}, open, setViewEmployee }) => {
-  const { t } = useTranslation(); // 't' is the translation function
+  const { t } = useTranslation();
 
   const handleClose = () => {
     setViewEmployee(null);
@@ -35,11 +35,11 @@ const EmployeesInfoModal = ({ employee = {}, open, setViewEmployee }) => {
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center" }}>
         <Button onClick={handleClose} color="inherit">
-          Close
+          {t("close")}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default EmployeesInfoModal;
+export default React.memo(EmployeesInfoModal);

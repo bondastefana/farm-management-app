@@ -55,4 +55,4 @@ const DeleteTaskModal = ({ open, onClose, onConfirm, task }) => {
   );
 };
 
-export default DeleteTaskModal;
+export default React.memo(DeleteTaskModal);

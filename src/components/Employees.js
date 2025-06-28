@@ -222,27 +222,27 @@ const Notes = ({ employees = [], fetchNotesInfo }) => {
           open={!!viewEmployee}
           setViewEmployee={setViewEmployee}
         />)}
-      <AddEmployeeModal
+      {addModalOpen && (<AddEmployeeModal
         open={addModalOpen}
         onClose={handleAddEmployeeClosed}
         onSuccess={handleAddEmployeeSuccess}
-      />
-      <EditEmployeeModal
+      />)}
+      {editModalOpen && (<EditEmployeeModal
         open={editModalOpen}
         onClose={handleEditEmployeeClosed}
         employee={editEmployee}
         onSubmit={handleEditEmployeeSubmit}
-      />
-      <DeleteEmployeeModal
+      />)}
+      {deleteEmployeeModalOpen && (<DeleteEmployeeModal
         open={deleteEmployeeModalOpen}
         onClose={handleDeleteEmployeeClosed}
         employee={employeeToDelete}
         onSubmit={handleDeleteEmployeeSubmit}
         loading={false}
-      />
+      />)}
       {AlertComponent}
     </>
   );
 };
 
-export default Notes;
+export default React.memo(Notes);

@@ -117,4 +117,4 @@ const EditEmployeeModal = ({ open, onClose, employee, onSubmit }) => {
   );
 };
 
-export default EditEmployeeModal;
+export default React.memo(EditEmployeeModal);

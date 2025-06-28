@@ -4,7 +4,7 @@ import { addFoodStock } from '../services/farmService';
 import { useFoodTypes } from './FoodStockTables';
 import { useTranslation } from 'react-i18next';
 
-export default function AddFoodStockForm({ onAdd }) {
+function AddFoodStockForm({ onAdd }) {
   const { t } = useTranslation();
   const foodTypes = useFoodTypes();
   const [form, setForm] = useState({
@@ -138,3 +138,5 @@ export default function AddFoodStockForm({ onAdd }) {
     </Paper>
   );
 }
+
+export default React.memo(AddFoodStockForm);

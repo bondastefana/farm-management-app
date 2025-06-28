@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 
 const EditNoteModal = ({ open, onClose, note, onSave }) => {
   const [editedNote, setEditedNote] = useState("");
-  const { t } = useTranslation(); // 't' is the translation function
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (note) {
@@ -63,4 +63,4 @@ const EditNoteModal = ({ open, onClose, note, onSave }) => {
   );
 };
 
-export default EditNoteModal;
+export default React.memo(EditNoteModal);

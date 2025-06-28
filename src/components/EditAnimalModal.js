@@ -138,4 +138,4 @@ const EditAnimalModal = ({ open, onClose, onSave, row }) => {
   );
 };
 
-export default EditAnimalModal;
+export default React.memo(EditAnimalModal);
