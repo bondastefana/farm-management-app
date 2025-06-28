@@ -52,6 +52,8 @@ const AddTaskModal = ({ open, onClose, onSave }) => {
     onClose();
   }, [setLoading, onClose]);
 
+  const isFormValid = title && description && assignee && date;
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t('add_new_task')}</DialogTitle>
@@ -110,7 +112,7 @@ const AddTaskModal = ({ open, onClose, onSave }) => {
       <DialogActions>
         <Button onClick={handleClose} color="secondary" variant="contained" disabled={loading}>{t('cancel')}</Button>
         <Box sx={{ position: 'relative' }}>
-          <Button onClick={handleSave} color="primary" variant="contained" disabled={loading}>{t('add_task')}</Button>
+          <Button onClick={handleSave} color="primary" variant="contained" disabled={loading || !isFormValid}>{t('add_task')}</Button>
           {loading && (
             <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', left: '50%', mt: '-12px', ml: '-12px' }} />
           )}

@@ -107,6 +107,14 @@ const Footer = () => {
           &copy; {new Date().getFullYear()} Farm Manager
         </Typography>
       </Box>
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1, gap: 2 }}>
+        <a href="https://www.usamvcluj.ro/" target="_blank" rel="noopener noreferrer">
+          <img src={process.env.PUBLIC_URL + '/usamv.gif'} alt="USAMV" style={{ height: 65, width: 'auto', marginRight: 8 }} />
+        </a>
+        <a href="https://fzb.usamvcluj.ro/" target="_blank" rel="noopener noreferrer">
+          <img src={process.env.PUBLIC_URL + '/zootehnie.png'} alt="Zootehnie" style={{ height: 65, width: 'auto' }} />
+        </a>
+      </Box>
     </Box>
   );
 };

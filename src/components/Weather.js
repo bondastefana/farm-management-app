@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Paper, Grid } from "@mui/material";
+import { Typography, Paper, Grid, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { formatDate } from '../services/farmService';
@@ -109,7 +109,10 @@ const Weather = ({ location }) => {
         maxHeight: 500,
         overflowY: 'auto',
       }}>
-      <Typography align="center" variant="h4" mb={2}>{t('weather')} {city}</Typography>
+      <Typography align="center" variant="h4" mb={2}>
+        <Box component="span" sx={{ fontSize: 22, mr: 1, verticalAlign: 'middle', display: 'inline-block' }} role="img" aria-label="weather">🌍</Box>
+        {t('weather')} {city}
+      </Typography>
       {/* Current Weather */}
       {weatherData ? (
         <Grid container

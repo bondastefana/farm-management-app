@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Paper, Typography, List, ListItem, ListItemText, ListItemIcon, Box, Chip, IconButton } from "@mui/material";
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
+import { Paper, Typography, List, ListItem, ListItemText, Box, Chip, IconButton } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { getFormattedDate } from '../services/utils';
 import AddTaskModal from './AddTaskModal';
@@ -28,8 +26,10 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
   // Always sync allTasks with tasks prop on mount and when tasks changes
   React.useEffect(() => {
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
-    setAllTasks(isAdmin ? (tasks || []) : (tasks || []).filter(t => t.assignee === authUser.username));
-  }, [tasks, isAdmin]);
+    setAllTasks(isAdmin ? (tasks || []) : (tasks || [])
+      .filter(t => t.assignee === authUser.username)
+      .sort((a, b) => b.date.seconds - a.date.seconds));
+  }, [tasks, isAdmin, allTasks]);
 
   // Poll for new tasks every 30 seconds
   React.useEffect(() => {
@@ -37,7 +37,9 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     const poll = async () => {
       const newTasks = await fetchTasks();
-      const filteredNewTasks = isAdmin ? newTasks : newTasks.filter(t => t.assignee === authUser.username);
+      const filteredNewTasks = isAdmin ? newTasks : newTasks
+        .filter(t => t.assignee === authUser.username)
+        .sort((a, b) => b.date.seconds - a.date.seconds);
       if (mounted) setAllTasks(filteredNewTasks);
     };
     poll(); // initial fetch
@@ -113,6 +115,7 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
             backgroundColor: 'inherit',
           }}
         >
+          <Box component="span" sx={{ fontSize: 22, mr: 1 }} role="img" aria-label="tasks">✔️</Box>
           <Typography
             align="center"
             variant="h4"
@@ -134,21 +137,21 @@ const TasksInfo = ({ tasks, fetchTasksInfo }) => {
           )}
           {allTasks.map((task) => (
             <ListItem key={task.id} alignItems="center" sx={{ mb: 1, borderRadius: 2, bgcolor: '#fff', boxShadow: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 0 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2 }}>
-                <ListItemIcon sx={{ minWidth: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', pl: 2 }}>
-                  {task.completed ? (
-                    <AssignmentTurnedInIcon color="success" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
-                  ) : (
-                    <AssignmentLateIcon color="warning" sx={{ fontSize: 32, verticalAlign: 'middle' }} />
-                  )}
-                </ListItemIcon>
+              <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 2, pl: 2 }}>
                 <ListItemText
                   primary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip
+                        label={task.completed ? t('completed') : t('pending')}
+                        size="small"
+                        sx={{
+                          color: task.completed ? 'success.dark' : 'warning.dark',
+                          fontWeight: 600
+                        }}
+                      />
                       <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                         {task.title}
                       </Typography>
-                      <Chip label={task.completed ? t('completed') : t('pending')} size="small" color={task.completed ? 'success' : 'warning'} />
                     </Box>
                   }
                   secondary={

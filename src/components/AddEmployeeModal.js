@@ -72,6 +72,8 @@ const AddEmployeeModal = ({ open, onClose, onSuccess }) => {
     }
   };
 
+  const isFormValid = form.firstName && form.lastName && form.role && form.userName && form.password;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
@@ -137,7 +139,7 @@ const AddEmployeeModal = ({ open, onClose, onSuccess }) => {
       </DialogContent>
       <DialogActions sx={{ p: 3 }}>
         <Button onClick={onClose}>{t('cancel')}</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+        <Button onClick={handleSubmit} variant="contained" color="primary" disabled={!isFormValid}>
           {t('submit')}
         </Button>
       </DialogActions>

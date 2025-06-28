@@ -136,7 +136,8 @@ const Notes = ({ employees = [], fetchNotesInfo }) => {
             zIndex: 99,
             pb: 1,
             backgroundColor: 'inherit',
-          }}  >
+          }}>
+          <Box component="span" sx={{ fontSize: 22, mr: 1 }} role="img" aria-label="employees">🧔🏻</Box>
           <Typography
             align="center"
             variant="h4"

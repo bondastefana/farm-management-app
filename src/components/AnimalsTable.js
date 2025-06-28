@@ -32,12 +32,12 @@ import useAlert from '../hooks/useAlert';
 import { updateAnimal, deleteAnimal } from '../services/farmService';
 
 export const emojiMap = {
-  'Cai': '🐎',
-  'Vaci': '🐄',
+  'Cabaline': '🐎',
+  'Bovine': '🐄',
   'Horses': '🐎',
   'Cows': '🐄',
-  'cal': '🐎',
-  'vaca': '🐄',
+  'cabalina': '🐎',
+  'bovina': '🐄',
   'cow': '🐄',
   'horse': '🐎',
 };

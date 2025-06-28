@@ -45,6 +45,7 @@ const AddNoteModal = ({ open, onClose, note, onSave }) => {
           onChange={handleNoteChange}
           variant="outlined"
           label={t('addNoteModalContent')}
+          required
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
@@ -55,6 +56,7 @@ const AddNoteModal = ({ open, onClose, note, onSave }) => {
           onClick={handleSave}
           color="primary"
           variant="contained"
+          disabled={!addNote.length}
         >
           {t('save')}
         </Button>

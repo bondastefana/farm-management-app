@@ -125,6 +125,7 @@ const Notes = ({ notes = [], fetchNotesInfo }) => {
             pb: 1,
             backgroundColor: 'inherit',
           }}  >
+          <Box component="span" sx={{ fontSize: 22, mr: 1 }} role="img" aria-label="note">📝</Box>
           <Typography
             align="center"
             variant="h4"

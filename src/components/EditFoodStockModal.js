@@ -95,7 +95,7 @@ export default function EditFoodStockModal({ open, onClose, row, onSave }) {
   return (
     <>
       <Modal open={open} onClose={onClose}>
-        <Box sx={{ ...style, bgcolor: (theme) => theme.palette.paper?.main || '#f5efe1' }}>
+        <Box sx={{ ...style, bgcolor: (theme) => theme.palette.paper?.main || '#f5efe1', maxWidth: '90vw', }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="h6">
               {t('foodStock.editTitle')}{emoji && <span style={{ fontSize: 28, marginLeft: 8 }}>{emoji}</span>}
