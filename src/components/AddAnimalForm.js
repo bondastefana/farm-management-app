@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Paper,
   Grid,
@@ -27,6 +27,7 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
   const { setLoading } = useLoading();
   const { showAlert, AlertComponent } = useAlert();
   const [formData, setFormData] = useState(initialState);
+  const { t } = useTranslation();
 
   const handleChange = (field) => (event) => {
     console.log('handleChange', field, event.target.value);
@@ -156,8 +157,8 @@ const AddAnimalForm = ({ refetchAllAnimals }) => {
               onChange={handleChange('gender')}
               InputLabelProps={{ shrink: true }}
             >
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="male">Male</MenuItem>
+              <MenuItem value="female">Female</MenuItem>
             </TextField>
 
           </Grid>

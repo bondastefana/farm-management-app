@@ -120,12 +120,12 @@ i18next
           actions: "Actions",
           is_required: "is required",
           edit_animal_modal_title: "Editare exemplar",
-          close: "Închide",
+          close: "Close",
           id: "ID",
-          age: "Vârstă",
-          male: "Mascul",
-          female: "Femelă",
-          observation: "Observație",
+          age: "Age",
+          male: "Male",
+          female: "Female",
+          observation: "Observation",
           add_food_stock_item: "Add Food Stock Item",
           name: "Name",
           quantity: "Quantity",
@@ -197,7 +197,7 @@ i18next
       ro: {
         translation: {
           species: 'Specie',
-          nr_crt: 'Numar crotaliu',
+          nr_crt: 'ID',
           birth_date: 'Data nasterii',
           gender: 'Gen',
           treatment: 'Tratament',
@@ -364,7 +364,7 @@ i18next
           footer: {
             animalWelfare: "Bunăstarea animalelor - Comisia Europeană"
           },
-          reports_dashboard: "Panou Rapoarte",
+          reports_dashboard: "Rapoarte",
           cows_gender_distribution: "Distribuția la bovine pe sexe",
           horses_gender_distribution: "Distribuția la cabaline pe sexe",
           cows_age_groups: "Grupe de vârstă la bovine (ani)",

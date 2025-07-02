@@ -2,7 +2,7 @@ import i18n from '../i18n';
 
 export const getFormattedDate = (seconds) => {
   const date = new Date(seconds * 1000);
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('ro-RO', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -57,7 +57,7 @@ export const headCells = [
     id: 'id',
     numeric: false,
     disablePadding: true,
-    label: 'Numar crotaliu (ID)',
+    label: 'ID',
   },
   {
     id: 'birthDate',

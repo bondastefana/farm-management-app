@@ -119,6 +119,23 @@ const AnimalsTable = ({ animals, type, id, refetchAllAnimals }) => {
   const isAdmin = useIsAdmin();
   const { showAlert, AlertComponent } = useAlert();
 
+  function formatDate(dateValue) {
+    if (!dateValue) return '-';
+    let dateObj;
+    if (typeof dateValue === 'object' && dateValue.seconds) {
+      dateObj = new Date(dateValue.seconds * 1000);
+    } else {
+      dateObj = new Date(dateValue);
+    }
+    if (!isNaN(dateObj.getTime())) {
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+    return '-';
+  }
+
   const handleRequestSort = useCallback((event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -245,7 +262,7 @@ const AnimalsTable = ({ animals, type, id, refetchAllAnimals }) => {
                       <TableCell component="th" id={labelId} scope="row" padding="none">
                         {row.animalId}
                       </TableCell>
-                      <TableCell >{row.birthDate}</TableCell>
+                      <TableCell >{formatDate(row.birthDate)} </TableCell>
                       <TableCell >{row.age}</TableCell>
                       <TableCell >{row.gender}</TableCell>
                       <TableCell >{row.treatment}</TableCell>

@@ -8,8 +8,9 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-const FarmInfo = ({ farmInfo = {} }) => {
-  const { name, location, size, owner, established, description, employeesNumber } = farmInfo;
+const FarmInfo = ({ farmInfo = {}, employeesNumber }) => {
+  const { name, location, size, owner, established, description } = farmInfo;
+
   const { t } = useTranslation(); // 't' is the translation function
   return (
     <Paper
@@ -55,7 +56,7 @@ const FarmInfo = ({ farmInfo = {} }) => {
             <LocationOnIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('location')}:</strong>&nbsp;{location}
           </Typography>
           <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <StraightenIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('size')}:</strong>&nbsp;{size}+
+            <StraightenIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('size')}:</strong>&nbsp;{size}
           </Typography>
           <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
             <PersonIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('owner')}:</strong>&nbsp;{owner}

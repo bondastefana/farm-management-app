@@ -15,8 +15,8 @@ import { calculateAge, translateAgeString } from '../services/utils';
 import { useTranslation } from 'react-i18next';
 
 const GENDER_OPTIONS = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
+  { value: 'male', label: 'male' },
+  { value: 'female', label: 'female' },
 ];
 
 const EditAnimalModal = ({ open, onClose, onSave, row }) => {
