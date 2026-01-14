@@ -172,7 +172,12 @@ const Notes = ({ employees = [], fetchNotesInfo }) => {
                         <EditIcon />
                       </IconButton>
                       {!isCurrentUser && (
-                        <IconButton edge="end" aria-label="delete" color="error" onClick={e => { e.stopPropagation(); handleDeleteEmployee(employee); }}>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          sx={{ color: 'error.main' }}
+                          onClick={e => { e.stopPropagation(); handleDeleteEmployee(employee); }}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       )}

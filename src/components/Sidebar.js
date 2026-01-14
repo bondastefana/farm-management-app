@@ -68,7 +68,7 @@ const Sidebar = ({ navOpen, handleNavToggle }) => {
             <AccountCircleIcon fontSize="large" sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
           )}
           <Typography variant="subtitle1">{user.name}</Typography>
-          <Button variant="contained" color="error" size="small" onClick={handleLogout}>
+          <Button variant="outlined" color="secondary" size="small" onClick={handleLogout}>
             {t('logOut')}
           </Button>
         </Box>

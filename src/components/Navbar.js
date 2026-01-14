@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import { IconButton, AppBar, Toolbar, Typography, Menu, MenuItem, Box } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import { Menu as MenuIcon, LightMode, DarkMode } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import i18n from '../i18n';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 import FlagIcon from 'react-world-flags';
 
 const Navbar = ({ handleNavClick }) => {
   const { t } = useTranslation(); // 't' is the translation function
-  const [anchorEl, setAnchorEl] = useState(null); // State for the dropdown menu
+  const { mode, setThemeMode } = useThemeMode(); // Theme mode management
+  const [anchorEl, setAnchorEl] = useState(null); // State for language dropdown menu
+  const [themeAnchorEl, setThemeAnchorEl] = useState(null); // State for theme dropdown menu
 
   const getInitialLanguage = () => {
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
@@ -53,14 +56,28 @@ const Navbar = ({ handleNavClick }) => {
 
   const handleNavToggle = React.useCallback(() => {
     handleNavClick();
-  }, [handleNavClick])
+  }, [handleNavClick]);
+
+  // Theme menu handlers
+  const handleThemeClick = React.useCallback((event) => {
+    setThemeAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleThemeClose = React.useCallback(() => {
+    setThemeAnchorEl(null);
+  }, []);
+
+  const handleThemeChange = React.useCallback((newMode) => {
+    setThemeMode(newMode);
+    handleThemeClose();
+  }, [setThemeMode, handleThemeClose]);
 
   return (
     <>
       <AppBar
         position="fixed"
-        style={{
-          backgroundColor: '#E1C16E',
+        color="primary"
+        sx={{
           borderRadius: 0
         }}>
         <Toolbar>
@@ -140,6 +157,40 @@ const Navbar = ({ handleNavClick }) => {
                   marginRight: 5
                 }} />
               {t('romanian')}
+            </MenuItem>
+          </Menu>
+
+          {/* Theme Toggle Icon and Menu */}
+          <IconButton
+            onClick={handleThemeClick}
+            color="inherit"
+            aria-controls="theme-menu"
+            aria-haspopup="true"
+            sx={{ ml: 1 }}
+          >
+            {mode === 'light' ? <LightMode /> : <DarkMode />}
+          </IconButton>
+
+          {/* Theme Dropdown Menu */}
+          <Menu
+            id="theme-menu"
+            anchorEl={themeAnchorEl}
+            open={Boolean(themeAnchorEl)}
+            onClose={handleThemeClose}
+          >
+            <MenuItem
+              onClick={() => handleThemeChange('light')}
+              selected={mode === 'light'}
+            >
+              <LightMode sx={{ mr: 1, fontSize: 20 }} />
+              {t('lightTheme')}
+            </MenuItem>
+            <MenuItem
+              onClick={() => handleThemeChange('dark')}
+              selected={mode === 'dark'}
+            >
+              <DarkMode sx={{ mr: 1, fontSize: 20 }} />
+              {t('darkTheme')}
             </MenuItem>
           </Menu>
         </Toolbar>

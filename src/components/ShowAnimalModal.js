@@ -15,7 +15,7 @@ const ShowAnimalModal = ({ open, onClose, row }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle sx={{ textAlign: 'center' }}>Animal Details</DialogTitle>
       <DialogContent>
-        <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 2, background: '#fafafa' }}>
+        <Box sx={{ p: 2, border: (theme) => `1px solid ${theme.palette.divider}`, borderRadius: 2, bgcolor: 'background.elevated' }}>
           <Typography variant="body2"><strong>ID:</strong> {row?.animalId}</Typography>
           <Divider sx={{ my: 1 }} />
           <Typography variant="body2"><strong>Birth Date:</strong> {row?.birthDate}</Typography>

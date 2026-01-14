@@ -29,7 +29,7 @@ const WeatherCard = ({ weatherData, forecast = null }) => {
   const translatedDescription = descriptionKey ? t(descriptionKey) : data.weather[0].description;
 
   return (
-    <Card sx={{ backgroundColor: '#fff' }}>
+    <Card>
       <CardContent>
         {forecast ?
           (<Typography variant="body1" align="center" sx={{ fontWeight: 'bold' }}>

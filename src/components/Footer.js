@@ -30,7 +30,7 @@ const Footer = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        borderTop: '1px solid #eee',
+        borderTop: (theme) => `1px solid ${theme.palette.divider}`,
       }}
     >
       <Box

@@ -21,7 +21,7 @@ const TaskCard = ({ task, onUpdate, onDelete }) => {
           </Button>
         </Box>
 
-        <Button variant="contained" color="error" sx={{ marginTop: 1 }} onClick={() => onDelete(task.id)}>
+        <Button variant="outlined" sx={{ marginTop: 1, color: 'error.main', borderColor: 'error.main' }} onClick={() => onDelete(task.id)}>
           {t('delete')}
         </Button>
       </CardContent>

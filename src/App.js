@@ -3,7 +3,7 @@ import './index.css';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import CircularProgress from '@mui/material/CircularProgress';
-import { CssBaseline, Box } from "@mui/material";
+import { CssBaseline, Box, useTheme } from "@mui/material";
 
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -31,6 +31,7 @@ function AppContent() {
   const location = useLocation();
   const [employees, setEmployees] = React.useState([]);
   const isLoginPage = location.pathname === "/login";
+  const theme = useTheme();
 
   const handleNavToggle = React.useCallback(() => {
     setNavOpen(!navOpen);
@@ -51,7 +52,7 @@ function AppContent() {
   return (
     <IsAdminProvider employees={employees}>
       <CssBaseline />
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: 'background.default' }}>
         {!isLoginPage && <Navbar handleNavClick={handleNavToggle} />}
         {loading && (
           <Box
@@ -61,7 +62,9 @@ function AppContent() {
               left: 0,
               width: '100vw',
               height: '100vh',
-              bgcolor: 'rgba(255, 255, 255, 0.6)',
+              bgcolor: theme.palette.mode === 'light'
+                ? 'rgba(255, 255, 255, 0.6)'
+                : 'rgba(0, 0, 0, 0.6)',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',

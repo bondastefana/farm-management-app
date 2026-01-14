@@ -283,7 +283,7 @@ const AnimalsTable = ({ animals, type, id, refetchAllAnimals }) => {
                             </IconButton>
                             <IconButton
                               aria-label="delete"
-                              color="error"
+                              sx={{ color: 'error.main' }}
                               onClick={e => {
                                 e.stopPropagation();
                                 handleOpenDeleteModal(row);

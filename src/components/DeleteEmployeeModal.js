@@ -23,7 +23,7 @@ const DeleteEmployeeModal = ({ open, onClose, employee, onSubmit, loading }) => 
           {t('deleteEmployeeConfirm') || t('Are you sure you want to delete this employee?')}
         </Typography>
         <Box sx={{
-          borderLeft: `4px solid ${employee.isAdmin ? '#f44336' : '#1976d2'}`,
+          borderLeft: (theme) => `4px solid ${employee.isAdmin ? theme.palette.error.main : theme.palette.info.main}`,
           pl: 2,
           mb: 2,
           bgcolor: 'background.default',
@@ -31,9 +31,9 @@ const DeleteEmployeeModal = ({ open, onClose, employee, onSubmit, loading }) => 
           py: 1
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <WarningAmberIcon color="error" />
+            <WarningAmberIcon sx={{ color: 'warning.main' }} />
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{employee.firstName} {employee.lastName}</Typography>
-            <Chip label={employee.isAdmin ? t('isAdmin') : (employee.role)} size="small" color={employee.isAdmin ? 'error' : 'default'} />
+            <Chip label={employee.isAdmin ? t('isAdmin') : (employee.role)} size="small" color={employee.isAdmin ? 'warning' : 'default'} />
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{t('userName')}: <b>{employee.userName}</b></Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{t('role')}: <b>{employee.role || '-'}</b></Typography>

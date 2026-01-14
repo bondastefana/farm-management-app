@@ -52,23 +52,23 @@ const FarmInfo = ({ farmInfo = {}, employeesNumber }) => {
           <Box component="span" sx={{ fontSize: 22, ml: 1 }} role="img" aria-label="farm">🌾</Box>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <LocationOnIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('location')}:</strong>&nbsp;{location}
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+            <LocationOnIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} /> <strong>{t('location')}:</strong>&nbsp;{location}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <StraightenIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('size')}:</strong>&nbsp;{size}
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+            <StraightenIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} /> <strong>{t('size')}:</strong>&nbsp;{size}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <PersonIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('owner')}:</strong>&nbsp;{owner}
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+            <PersonIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} /> <strong>{t('owner')}:</strong>&nbsp;{owner}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <AccountBalanceIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('establishment')}:</strong>&nbsp;{established}
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+            <AccountBalanceIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} /> <strong>{t('establishment')}:</strong>&nbsp;{established}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center' }}>
-            <AgricultureIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563' }} /> <strong>{t('employeesNumber')}:</strong>&nbsp;{employeesNumber}
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+            <AgricultureIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} /> <strong>{t('employeesNumber')}:</strong>&nbsp;{employeesNumber}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: '1rem', color: '#4b5563', display: 'flex', alignItems: 'flex-start' }}>
-            <InfoOutlinedIcon sx={{ fontSize: 20, mr: 1, color: '#4b5563', mt: '2px' }} />
+          <Typography variant="body2" sx={{ fontSize: '1rem', color: 'text.secondary', display: 'flex', alignItems: 'flex-start' }}>
+            <InfoOutlinedIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary', mt: '2px' }} />
             <Box component="span" sx={{ display: 'inline', ml: 0, wordBreak: 'break-word' }}>
               <strong>{t('description')}:</strong>&nbsp;{description}
             </Box>

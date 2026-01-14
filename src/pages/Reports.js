@@ -7,7 +7,15 @@ import { calculateAge } from '../services/utils';
 import { emojiMap } from '../components/AnimalsTable';
 import { useFoodTypes } from '../components/FoodStockTables';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A569BD', '#E74C3C'];
+// Chart colors aligned with Natural Farm theme (Beautiful Olive palette)
+const COLORS = [
+  '#748E63',  // Primary Olive Green (earthy & beautiful)
+  '#795548',  // Secondary Brown
+  '#FFC107',  // Accent Golden
+  '#2196F3',  // Info Blue
+  '#9FB892',  // Light Olive Green
+  '#FF9800',  // Warning Orange
+];
 
 function getGenderData(animals) {
   const genderCounts = animals.reduce((acc, animal) => {
@@ -69,7 +77,7 @@ const TinyBarChart = ({ data, title, emoji }) => (
         <XAxis dataKey="name" />
         <YAxis allowDecimals={false} />
         <Tooltip />
-        <Bar dataKey="quantity" fill="#0088FE" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="quantity" fill="#748E63" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   </Paper>
