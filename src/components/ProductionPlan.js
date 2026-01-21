@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -22,10 +22,9 @@ import {
   Chip,
   Card,
   CardContent,
-  Tooltip,
-  Divider
+  Tooltip
 } from '@mui/material';
-import { Add, Edit, Delete, Refresh, TrendingUp, Agriculture, Warning, CheckCircle, Calculate as CalculateIcon, TrendingDown } from '@mui/icons-material';
+import { Add, Edit, Delete, Refresh, TrendingUp, Calculate as CalculateIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -61,7 +60,7 @@ export default function ProductionPlan() {
   });
   const [error, setError] = useState('');
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -77,11 +76,11 @@ export default function ProductionPlan() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const handleOpenDialog = (plan = null) => {
     if (plan) {

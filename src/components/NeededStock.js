@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -39,7 +39,7 @@ export default function NeededStock() {
   const [editValue, setEditValue] = useState('');
   const [error, setError] = useState('');
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -55,11 +55,11 @@ export default function NeededStock() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const handleEditClick = (species, foodType, currentValue) => {
     setEditingSpecies(species);

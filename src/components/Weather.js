@@ -54,51 +54,51 @@ const Weather = ({ location }) => {
   }, []);
 
   // Get city name from lat/lng using Google Maps API
-  const getCityFromLatLng = React.useCallback(async (lat, lon) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_API_KEY}`;
+  // const getCityFromLatLng = React.useCallback(async (lat, lon) => {
+  //   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_API_KEY}`;
 
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
+  //   try {
+  //     const res = await fetch(url);
+  //     const data = await res.json();
 
-      if (data.status === "OK" && data.results.length > 0) {
-        const result = data.results[0];
+  //     if (data.status === "OK" && data.results.length > 0) {
+  //       const result = data.results[0];
 
-        // Try to find city name in order of preference
-        const locality = result.address_components.find((comp) =>
-          comp.types.includes("locality")
-        )?.long_name;
+  //       // Try to find city name in order of preference
+  //       const locality = result.address_components.find((comp) =>
+  //         comp.types.includes("locality")
+  //       )?.long_name;
 
-        if (locality) return locality;
+  //       if (locality) return locality;
 
-        // Fallback to postal_town
-        const postalTown = result.address_components.find((comp) =>
-          comp.types.includes("postal_town")
-        )?.long_name;
+  //       // Fallback to postal_town
+  //       const postalTown = result.address_components.find((comp) =>
+  //         comp.types.includes("postal_town")
+  //       )?.long_name;
 
-        if (postalTown) return postalTown;
+  //       if (postalTown) return postalTown;
 
-        // Fallback to administrative_area_level_2
-        const adminArea2 = result.address_components.find((comp) =>
-          comp.types.includes("administrative_area_level_2")
-        )?.long_name;
+  //       // Fallback to administrative_area_level_2
+  //       const adminArea2 = result.address_components.find((comp) =>
+  //         comp.types.includes("administrative_area_level_2")
+  //       )?.long_name;
 
-        if (adminArea2) return adminArea2;
+  //       if (adminArea2) return adminArea2;
 
-        // Fallback to administrative_area_level_1
-        const adminArea1 = result.address_components.find((comp) =>
-          comp.types.includes("administrative_area_level_1")
-        )?.long_name;
+  //       // Fallback to administrative_area_level_1
+  //       const adminArea1 = result.address_components.find((comp) =>
+  //         comp.types.includes("administrative_area_level_1")
+  //       )?.long_name;
 
-        if (adminArea1) return adminArea1;
-      } else {
-        console.error("Geocoding API error:", data.status);
-      }
-    } catch (err) {
-      console.error("Error fetching city name:", err);
-    }
-    return null;
-  }, []);
+  //       if (adminArea1) return adminArea1;
+  //     } else {
+  //       console.error("Geocoding API error:", data.status);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching city name:", err);
+  //   }
+  //   return null;
+  // }, []);
 
   // Use location prop to load weather + city
   useEffect(() => {

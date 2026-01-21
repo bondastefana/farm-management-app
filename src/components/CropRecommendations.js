@@ -26,11 +26,7 @@ const CropRecommendations = () => {
   const [error, setError] = React.useState(null);
   const [expanded, setExpanded] = React.useState({});
 
-  React.useEffect(() => {
-    loadRecommendations();
-  }, []);
-
-  const loadRecommendations = async () => {
+  const loadRecommendations = React.useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -51,7 +47,11 @@ const CropRecommendations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  React.useEffect(() => {
+    loadRecommendations();
+  }, [loadRecommendations]);
 
   // Toggle expand/collapse for a crop
   const handleToggleExpand = (cropId) => {
@@ -138,7 +138,7 @@ const CropRecommendations = () => {
             {t('cropRecommendations.subtitle', 'Best agricultural crops for your location:')}
           </Typography>
           <List sx={{ p: 0 }}>
-            {recommendations.map((rec, index) => {
+            {recommendations.map((rec) => {
               const suitability = getSuitabilityLevel(rec.suitability);
               const isExpanded = expanded[rec.cropId] || false;
               return (

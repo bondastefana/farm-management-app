@@ -21,7 +21,6 @@ const cowsCollectionRef = collection(db, 'livestock', 'animalsInfo', 'cow');
 const horseCollectionRef = collection(db, 'livestock', 'animalsInfo', 'horse');
 const authCollectionRef = collection(db, 'authentication');
 const foodStockCollectionRef = collection(db, 'foodstock');
-const locationConditionsCollectionRef = collection(db, 'locationConditions');
 const consumptionRatesCollectionRef = collection(db, 'consumptionRates');
 const productionPlansCollectionRef = collection(db, 'productionPlans');
 
@@ -1151,8 +1150,8 @@ export const getCropRecommendations = (locationConditions) => {
       explanations,
       rotationNote: previousCropId ? (
         crop.benefitsAfterCrops?.includes(previousCropId) ? 'excellent_rotation' :
-        crop.unsuitableAfterCrops?.includes(previousCropId) ? 'poor_rotation' :
-        previousCropId === cropId ? 'monoculture' : 'neutral_rotation'
+          crop.unsuitableAfterCrops?.includes(previousCropId) ? 'poor_rotation' :
+            previousCropId === cropId ? 'monoculture' : 'neutral_rotation'
       ) : null
     });
   });
