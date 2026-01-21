@@ -3,7 +3,7 @@ import { Typography, Paper, Grid, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { formatDate } from '../services/farmService';
-import { WEATHER_API_KEY, GOOGLE_API_KEY } from '../services/constants';
+import { WEATHER_API_KEY } from '../services/constants';
 import WeatherCard from './WeatherCard';
 
 const Weather = ({ location }) => {
