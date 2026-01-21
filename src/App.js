@@ -9,7 +9,8 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Animals from "./pages/Animals";
 import Stocks from "./pages/Stocks";
-import Reports from "./pages/Reports"; 
+import ParcelDetails from "./pages/ParcelDetails";
+import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 
 import { fetchEmployees } from './services/farmService';
@@ -81,6 +82,7 @@ function AppContent() {
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/animals" element={<PrivateRoute><Animals /></PrivateRoute>} />
             <Route path="/stocks" element={<PrivateRoute><Stocks /></PrivateRoute>} />
+            <Route path="/parcel-details" element={<PrivateRoute><ParcelDetails /></PrivateRoute>} />
             <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
 
             <Route path="*" element={<Navigate to="/login" replace />} />

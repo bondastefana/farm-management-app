@@ -22,6 +22,10 @@ const Weather = ({ location }) => {
 
       if (data.cod === 200) {
         setWeatherData(data);
+        // Get city name from OpenWeatherMap response
+        if (data.name) {
+          setCity(data.name);
+        }
       } else {
         setError("Unable to fetch weather data.");
       }
@@ -57,11 +61,38 @@ const Weather = ({ location }) => {
       const res = await fetch(url);
       const data = await res.json();
 
-      if (data.results.length > 0) {
-        const cityName = data.results[0].address_components.find((comp) =>
+      if (data.status === "OK" && data.results.length > 0) {
+        const result = data.results[0];
+
+        // Try to find city name in order of preference
+        const locality = result.address_components.find((comp) =>
           comp.types.includes("locality")
         )?.long_name;
-        return cityName;
+
+        if (locality) return locality;
+
+        // Fallback to postal_town
+        const postalTown = result.address_components.find((comp) =>
+          comp.types.includes("postal_town")
+        )?.long_name;
+
+        if (postalTown) return postalTown;
+
+        // Fallback to administrative_area_level_2
+        const adminArea2 = result.address_components.find((comp) =>
+          comp.types.includes("administrative_area_level_2")
+        )?.long_name;
+
+        if (adminArea2) return adminArea2;
+
+        // Fallback to administrative_area_level_1
+        const adminArea1 = result.address_components.find((comp) =>
+          comp.types.includes("administrative_area_level_1")
+        )?.long_name;
+
+        if (adminArea1) return adminArea1;
+      } else {
+        console.error("Geocoding API error:", data.status);
       }
     } catch (err) {
       console.error("Error fetching city name:", err);
@@ -74,9 +105,9 @@ const Weather = ({ location }) => {
     if (location) {
       fetchWeatherData(location.latitude, location.longitude);
       fetchWeatherForecast(location.latitude, location.longitude);
-      getCityFromLatLng(location.latitude, location.longitude).then(setCity);
+      // City name is now fetched from OpenWeatherMap response
     }
-  }, [fetchWeatherData, fetchWeatherForecast, getCityFromLatLng, location]);
+  }, [fetchWeatherData, fetchWeatherForecast, location]);
 
   // Group forecast data by date
   const groupForecastByDate = React.useCallback((forecastList) => {
