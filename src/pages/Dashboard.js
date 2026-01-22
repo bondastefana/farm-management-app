@@ -10,7 +10,7 @@ import FarmInfo from "../components/FarmInfo"
 import TasksInfo from '../components/TasksInfo';
 import { useLoading } from '../contexts/LoadingContext';
 
-import { fetchNotes, fetchEmployees, fetchTasks } from '../services/farmService';
+import { fetchNotes, fetchEmployees, fetchTasks, getFarmLocation } from '../services/farmService';
 
 const Dashboard = () => {
   const [location, setLocation] = useState(null);
@@ -54,6 +54,17 @@ const Dashboard = () => {
     setTasks(sortedTasks);
   }, [])
 
+  // Fetch farm location (persisted, one-time geolocation, or default fallback)
+  const fetchLocationInfo = React.useCallback(async () => {
+    const farmLocation = await getFarmLocation();
+    if (farmLocation) {
+      setLocation({
+        latitude: farmLocation.latitude,
+        longitude: farmLocation.longitude
+      });
+    }
+  }, []);
+
   const fetchAllData = React.useCallback(async () => {
     setLoading(true);
 
@@ -63,29 +74,17 @@ const Dashboard = () => {
         fetchNotesInfo(),
         fetchEmployeesInfo(),
         fetchTasksInfo(),
+        fetchLocationInfo(),
       ]);
       setLoading(false);
     } catch (error) {
       setLoading(false);
     }
-  }, [fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo, fetchTasksInfo, setLoading])
+  }, [fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo, fetchTasksInfo, fetchLocationInfo, setLoading])
 
   useEffect(() => {
-    // Fetch user's location for weather
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          setLocation({ latitude, longitude });
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-        }
-      );
-    }
-
     fetchAllData();
-  }, [fetchAllData, fetchEmployeesInfo, fetchFarmInfo, fetchNotesInfo]);
+  }, [fetchAllData]);
 
   return (
     <Grid container spacing={2}>

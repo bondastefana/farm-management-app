@@ -213,7 +213,7 @@ const CropRecommendations = () => {
                         {t('cropRecommendations.scoreBreakdown', 'Score Breakdown')}:
                       </Typography>
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        {rec.explanations?.map((expl) => (
+                        {rec.explanations?.filter(expl => expl.param !== 'waterAvailability' && expl.param !== 'cropRotation').map((expl) => (
                           <Box
                             key={expl.param}
                             sx={{

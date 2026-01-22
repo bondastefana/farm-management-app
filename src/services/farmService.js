@@ -8,7 +8,7 @@ import {
   CloudySnowing
 } from "@mui/icons-material";
 
-import { addDoc, collection, getDocs, deleteDoc, updateDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { addDoc, collection, getDocs, deleteDoc, updateDoc, doc, setDoc, getDoc, query, where, orderBy, limit as firestoreLimit, serverTimestamp } from "firebase/firestore";
 import db from "../firebase/firebaseConfig";
 import i18n from '../i18n';
 
@@ -23,6 +23,11 @@ const authCollectionRef = collection(db, 'authentication');
 const foodStockCollectionRef = collection(db, 'foodstock');
 const consumptionRatesCollectionRef = collection(db, 'consumptionRates');
 const productionPlansCollectionRef = collection(db, 'productionPlans');
+const feedingPeriodsDocRef = doc(db, 'settings', 'feedingPeriods');
+
+// Parcels and Soil Analysis Collections
+const parcelsCollectionRef = collection(db, 'parcels');
+const soilAnalysesCollectionRef = collection(db, 'soilAnalyses');
 
 export const getDayName = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -438,6 +443,88 @@ export const addFoodStock = async (data) => {
   }
 };
 
+// --- Farm Location (for Weather & Location Conditions) ---
+
+// Default fallback location (Romania - Florești, Cluj)
+const DEFAULT_LOCATION = {
+  latitude: 46.7489,
+  longitude: 23.4953,
+  name: "Florești, Cluj, Romania",
+  source: "default"
+};
+
+// Fetch saved farm location from Firebase
+export const fetchFarmLocation = async () => {
+  try {
+    const docRef = doc(db, 'settings', 'farmLocation');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching farm location:", error);
+    return null;
+  }
+};
+
+// Save farm location to Firebase
+export const saveFarmLocation = async (latitude, longitude, name = null, source = "manual") => {
+  try {
+    const docRef = doc(db, 'settings', 'farmLocation');
+    const locationData = {
+      latitude,
+      longitude,
+      name: name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+      source, // 'geolocation', 'manual', or 'default'
+      lastUpdated: new Date()
+    };
+    await setDoc(docRef, locationData);
+    return locationData;
+  } catch (error) {
+    console.error("Error saving farm location:", error);
+    return null;
+  }
+};
+
+// Get farm location with fallback logic
+// Priority: 1. Saved location from Firebase, 2. Browser geolocation (one-time), 3. Default location
+export const getFarmLocation = async () => {
+  // First, try to get saved location from Firebase
+  const savedLocation = await fetchFarmLocation();
+  if (savedLocation) {
+    console.log("Using saved farm location from database");
+    return savedLocation;
+  }
+
+  // If no saved location, try browser geolocation (one-time setup)
+  if (navigator.geolocation) {
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 10000,
+          maximumAge: 0
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+      console.log("Using browser geolocation for first-time setup");
+
+      // Save this location for future use
+      const savedData = await saveFarmLocation(latitude, longitude, null, "geolocation");
+      return savedData || { latitude, longitude, source: "geolocation" };
+    } catch (error) {
+      console.warn("Geolocation not available or denied:", error.message);
+    }
+  }
+
+  // Fallback to default location
+  console.log("Using default fallback location");
+  // Optionally save the default location
+  await saveFarmLocation(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, DEFAULT_LOCATION.name, "default");
+  return DEFAULT_LOCATION;
+};
+
 // --- Location Conditions ---
 
 // Fetch location conditions from Firebase
@@ -715,26 +802,6 @@ export const fetchExternalLocationData = async (latitude, longitude) => {
     results.errors.push("altitude");
   }
 
-  // Calculate water availability from precipitation and soil water retention
-  if (results.climate?.precipitation?.value && results.soil?.waterRetention?.value) {
-    const precipitation = results.climate.precipitation.value;
-    const retention = results.soil.waterRetention.value;
-
-    // Water availability index (0-100) based on precipitation and soil retention
-    // Formula: considers both annual precipitation and soil's ability to retain water
-    const baseAvailability = Math.min(100, (precipitation / 10)); // Scale precipitation (1000mm = 100)
-    const retentionBonus = (retention / 100) * 15; // Up to 15 bonus points from retention
-    const waterAvailability = Math.min(100, Math.round(baseAvailability + retentionBonus));
-
-    results.waterAvailability = {
-      value: waterAvailability,
-      unit: "index",
-      source: "auto",
-      lastModified: new Date(),
-      description: "Calculated from precipitation and soil water retention"
-    };
-  }
-
   return results;
 };
 
@@ -754,7 +821,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Sandy Loam", "Silt Loam", "Sandy Clay Loam"],
     optimalElevation: { max: 1800 },
     optimalNitrogen: { min: 1.0, max: 5.0, ideal: 2.5 },  // g/kg soil nitrogen
-    optimalWaterAvailability: { min: 50, max: 90, ideal: 70 },  // Water availability index
     unsuitableAfterCrops: ["corn"],  // Avoid corn-after-corn
     benefitsAfterCrops: ["soybean", "clover", "alfalfa"]  // Benefits from nitrogen-fixing crops
   },
@@ -768,7 +834,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Silt Loam", "Silty Clay Loam"],
     optimalElevation: { max: 2500 },
     optimalNitrogen: { min: 1.2, max: 4.0, ideal: 2.2 },
-    optimalWaterAvailability: { min: 40, max: 85, ideal: 55 },
     unsuitableAfterCrops: ["wheat", "barley"],
     benefitsAfterCrops: ["clover", "alfalfa", "soybean"]
   },
@@ -782,7 +847,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Sandy Loam", "Silt Loam", "Sandy Clay Loam"],
     optimalElevation: { max: 3000 },
     optimalNitrogen: { min: 1.0, max: 3.5, ideal: 2.0 },
-    optimalWaterAvailability: { min: 30, max: 70, ideal: 48 },
     unsuitableAfterCrops: ["barley", "wheat"],
     benefitsAfterCrops: ["clover", "alfalfa"]
   },
@@ -796,7 +860,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Sandy Loam", "Loam", "Silt Loam", "Loamy Sand"],
     optimalElevation: { max: 2500 },
     optimalNitrogen: { min: 1.5, max: 4.5, ideal: 2.8 },
-    optimalWaterAvailability: { min: 50, max: 75, ideal: 63 },
     unsuitableAfterCrops: ["potato", "sugar_beet"],
     benefitsAfterCrops: ["clover", "wheat"]
   },
@@ -810,7 +873,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Sandy Loam", "Silt Loam", "Sandy Clay Loam"],
     optimalElevation: { max: 1800 },
     optimalNitrogen: { min: 1.0, max: 3.5, ideal: 2.0 },
-    optimalWaterAvailability: { min: 40, max: 65, ideal: 53 },
     unsuitableAfterCrops: ["sunflower"],
     benefitsAfterCrops: ["wheat", "corn"]
   },
@@ -824,7 +886,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Silt Loam", "Silty Clay Loam"],
     optimalElevation: { max: 1500 },
     optimalNitrogen: { min: 0.8, max: 3.0, ideal: 1.5 },  // Lower requirement (nitrogen-fixing)
-    optimalWaterAvailability: { min: 50, max: 100, ideal: 75 },
     unsuitableAfterCrops: ["soybean", "alfalfa", "clover"],
     benefitsAfterCrops: ["corn", "wheat"]
   },
@@ -838,7 +899,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Sandy Loam", "Silt Loam", "Sandy Clay Loam"],
     optimalElevation: { max: 2800 },
     optimalNitrogen: { min: 1.0, max: 3.5, ideal: 2.0 },
-    optimalWaterAvailability: { min: 40, max: 80, ideal: 60 },
     unsuitableAfterCrops: ["oats"],
     benefitsAfterCrops: ["clover", "alfalfa"]
   },
@@ -852,7 +912,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Silt Loam", "Silty Clay Loam"],
     optimalElevation: { max: 2000 },
     optimalNitrogen: { min: 1.5, max: 5.0, ideal: 3.0 },
-    optimalWaterAvailability: { min: 40, max: 75, ideal: 58 },
     unsuitableAfterCrops: ["rapeseed", "sunflower"],
     benefitsAfterCrops: ["wheat", "barley"]
   },
@@ -866,7 +925,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Sandy Loam", "Silt Loam"],
     optimalElevation: { max: 2200 },
     optimalNitrogen: { min: 0.8, max: 3.0, ideal: 1.5 },  // Lower requirement (nitrogen-fixing)
-    optimalWaterAvailability: { min: 40, max: 90, ideal: 65 },
     unsuitableAfterCrops: ["alfalfa", "clover"],
     benefitsAfterCrops: ["corn", "wheat", "potato"]
   },
@@ -880,7 +938,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Silt Loam", "Silty Clay Loam"],
     optimalElevation: { max: 1600 },
     optimalNitrogen: { min: 1.5, max: 4.5, ideal: 2.8 },
-    optimalWaterAvailability: { min: 45, max: 70, ideal: 58 },
     unsuitableAfterCrops: ["sugar_beet", "potato"],
     benefitsAfterCrops: ["wheat", "barley"]
   },
@@ -894,7 +951,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Sandy Loam", "Loamy Sand", "Clay Loam"],
     optimalElevation: { max: 3000 },
     optimalNitrogen: { min: 0.8, max: 3.0, ideal: 1.5 },  // Tolerates low nitrogen
-    optimalWaterAvailability: { min: 30, max: 70, ideal: 50 },
     unsuitableAfterCrops: ["rye"],
     benefitsAfterCrops: ["clover", "potato"]
   },
@@ -908,7 +964,6 @@ const cropDatabase = {
     suitableSoilTypes: ["Loam", "Clay Loam", "Silt Loam", "Silty Clay Loam"],
     optimalElevation: { max: 2400 },
     optimalNitrogen: { min: 0.5, max: 2.5, ideal: 1.2 },  // Lowest requirement (nitrogen-fixing)
-    optimalWaterAvailability: { min: 50, max: 100, ideal: 75 },
     unsuitableAfterCrops: ["clover", "alfalfa"],
     benefitsAfterCrops: ["corn", "wheat", "potato", "rapeseed"]
   }
@@ -1032,7 +1087,6 @@ export const getCropRecommendations = (locationConditions) => {
       soilType: 0,
       elevation: 0,
       nitrogen: 0,
-      waterAvailability: 0,
       cropRotation: 0
     };
 
@@ -1072,34 +1126,31 @@ export const getCropRecommendations = (locationConditions) => {
       crop.optimalNitrogen
     );
 
-    scores.waterAvailability = calculateParameterScore(
-      locationConditions.waterAvailability?.value,
-      crop.optimalWaterAvailability
-    );
-
     scores.cropRotation = calculateCropRotationScore(
       previousCropId,
       crop,
       cropId
     );
 
-    // Weight the scores (adjusted to include new parameters)
+    // Weighted average calculation
+    // Redistributed waterAvailability weight (0.08) to precipitation (+0.05) and temperature (+0.03)
     const weights = {
-      temperature: 0.20,      // Climate is critical
-      precipitation: 0.15,    // Water from rain
-      frostDays: 0.12,        // Cold tolerance
-      pH: 0.12,               // Soil chemistry
-      soilType: 0.12,         // Soil structure
-      elevation: 0.08,        // Altitude effects
-      nitrogen: 0.10,         // Soil fertility
-      waterAvailability: 0.08, // Overall water
-      cropRotation: 0.03      // Rotation bonus/penalty
+      temperature: 0.23,      // +0.03 (was 0.20)
+      precipitation: 0.20,    // +0.05 (was 0.15)
+      frostDays: 0.12,
+      pH: 0.12,
+      soilType: 0.12,
+      nitrogen: 0.10,
+      elevation: 0.08,
+      cropRotation: 0.03
     };
 
     // Calculate weighted average
     const totalScore = Object.entries(scores).reduce((sum, [param, score]) => {
       return sum + (score * weights[param]);
     }, 0);
+
+    const finalScore = totalScore;
 
     // Generate explanations for each parameter
     const explanations = [];
@@ -1128,10 +1179,6 @@ export const getCropRecommendations = (locationConditions) => {
     const nitrogenExpl = getScoreExplanation(scores.nitrogen, 'nitrogen');
     explanations.push({ param: 'nitrogen', level: nitrogenExpl.key, score: Math.round(scores.nitrogen) });
 
-    // Water Availability
-    const waterExpl = getScoreExplanation(scores.waterAvailability, 'waterAvailability');
-    explanations.push({ param: 'waterAvailability', level: waterExpl.key, score: Math.round(scores.waterAvailability) });
-
     // Elevation
     const elevExpl = getScoreExplanation(scores.elevation, 'elevation');
     explanations.push({ param: 'elevation', level: elevExpl.key, score: Math.round(scores.elevation) });
@@ -1145,7 +1192,7 @@ export const getCropRecommendations = (locationConditions) => {
     recommendations.push({
       cropId,
       name: crop.name,
-      suitability: Math.round(totalScore),
+      suitability: Math.round(finalScore),
       scores,
       explanations,
       rotationNote: previousCropId ? (
@@ -1288,6 +1335,43 @@ export const resetConsumptionRates = async (species) => {
   }
 };
 
+// Feeding Periods Management
+// Default feeding periods (days per year for each food type)
+export const getDefaultFeedingPeriods = () => ({
+  concentrates: 300,  // Fed most of the year
+  fiber: 365,         // Fed year-round
+  greenFodder: 180,   // Seasonal - growing season
+  succulents: 120,    // Seasonal - limited availability
+});
+
+export const fetchFeedingPeriods = async () => {
+  try {
+    const docSnap = await getDoc(feedingPeriodsDocRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    // Return defaults if not set
+    return getDefaultFeedingPeriods();
+  } catch (error) {
+    console.error("Error fetching feeding periods:", error);
+    return getDefaultFeedingPeriods();
+  }
+};
+
+export const updateFeedingPeriod = async (foodType, days) => {
+  try {
+    const currentPeriods = await fetchFeedingPeriods();
+    await setDoc(feedingPeriodsDocRef, {
+      ...currentPeriods,
+      [foodType]: days
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating feeding period:", error);
+    return false;
+  }
+};
+
 export const calculateNeededStock = async () => {
   try {
     // Fetch all animals grouped by species
@@ -1308,6 +1392,7 @@ export const calculateNeededStock = async () => {
         },
         animalCounts: {},
         rates: {},
+        feedingPeriods: getDefaultFeedingPeriods(),
         speciesList: []
       };
     }
@@ -1315,37 +1400,493 @@ export const calculateNeededStock = async () => {
     // Fetch consumption rates for all species
     const rates = await fetchConsumptionRates(speciesList);
 
+    // Fetch feeding periods (days per year for each food type)
+    const feedingPeriods = await fetchFeedingPeriods();
+
     // Calculate animal counts per species
     const animalCounts = {};
     speciesList.forEach(species => {
       animalCounts[species] = animalsBySpecies[species].length;
     });
 
-    // Calculate needed stock by food type across all species
-    // Formula: (kg/day per animal) × 365 days × number of animals
+    // Calculate needed stock
+    // Formula per species: TotalForSpecies = SUM over food types (dailyRate × numberOfAnimals × daysPerYear)
+    // Then sum all species together
     const foodTypes = ['concentrates', 'fiber', 'greenFodder', 'succulents'];
-    const neededStock = {};
 
+    // Calculate per species first
+    const neededStockBySpecies = {};
+    speciesList.forEach(species => {
+      let speciesTotal = 0;
+      const speciesByFoodType = {};
+
+      foodTypes.forEach(foodType => {
+        const dailyRate = rates[species]?.[foodType] || 0;
+        const count = animalCounts[species];
+        const daysPerYear = feedingPeriods[foodType] || 365;
+
+        // Calculate for this species and food type
+        const amount = dailyRate * count * daysPerYear;
+        speciesByFoodType[foodType] = amount;
+        speciesTotal += amount;
+      });
+
+      neededStockBySpecies[species] = {
+        byFoodType: speciesByFoodType,
+        total: speciesTotal
+      };
+    });
+
+    // Now sum across all species to get totals by food type
+    const neededStock = {};
     foodTypes.forEach(foodType => {
       let total = 0;
       speciesList.forEach(species => {
-        const speciesRate = rates[species]?.[foodType] || 0;
-        const count = animalCounts[species];
-        total += (count * speciesRate * 365);
+        total += neededStockBySpecies[species].byFoodType[foodType];
       });
       neededStock[foodType] = total;
     });
 
+    // Grand total = sum of all food types across all species
     neededStock.total = Object.values(neededStock).reduce((sum, val) => sum + val, 0);
 
     return {
       neededStock,
+      neededStockBySpecies,
       animalCounts,
       rates,
+      feedingPeriods,
       speciesList
     };
   } catch (error) {
     console.error("Error calculating needed stock:", error);
+    return null;
+  }
+};
+
+// ============================================================================
+// PARCELS & SOIL ANALYSIS MANAGEMENT (Append-Only Historical Data)
+// ============================================================================
+//
+// DATA MODEL:
+// -----------
+// parcels/
+//   {parcelId}/                           - Root collection of farm parcels
+//     name: string                        - Parcel name/identifier
+//     area: number                        - Area in hectares
+//     location: { lat, lng }              - GPS coordinates
+//     description: string                 - Optional description
+//     cropType: string                    - Current or planned crop
+//     isActive: boolean                   - Active/archived status
+//     createdAt: Timestamp                - Creation timestamp
+//     createdBy: string                   - User who created
+//
+// soilAnalyses/
+//   {analysisId}/                         - Root collection of soil analyses
+//     parcelId: string                    - Reference to parcel
+//     parcelName: string                  - Denormalized for easy display
+//     date: Timestamp                     - Date analysis was performed
+//     status: string                      - 'pending', 'completed', 'archived'
+//     laboratoryName: string              - Lab that performed analysis
+//     notes: string                       - Additional notes
+//     createdAt: Timestamp                - Record creation timestamp
+//     createdBy: string                   - User who created
+//
+//     samples/ (subcollection)            - Soil samples for this analysis
+//       {sampleId}/
+//         sampleNumber: number            - Sample identifier (1, 2, 3...)
+//         location: { lat, lng }          - GPS coordinates of probe
+//         depth: number                   - Depth in cm
+//         pH: number                      - pH value
+//         nitrogen: number                - Nitrogen content (g/kg)
+//         phosphorus: number              - Phosphorus content (mg/kg)
+//         potassium: number               - Potassium content (mg/kg)
+//         organicMatter: number           - Organic matter (%)
+//         soilType: string                - Soil type classification
+//         notes: string                   - Sample-specific notes
+//         createdAt: Timestamp            - Creation timestamp
+//
+// RULES:
+// ------
+// - Append-only: Never update or delete parcels/analyses/samples
+// - To "update" a parcel: create new version or use isActive flag
+// - Historical data preserved for auditing and trend analysis
+// - Samples are always linked to an analysis (subcollection)
+// ============================================================================
+
+// --- PARCELS ---
+
+// Fetch all parcels
+export const fetchParcels = async () => {
+  try {
+    const snapshot = await getDocs(parcelsCollectionRef);
+    const parcels = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return parcels.sort((a, b) => {
+      // Sort by active status first, then by creation date
+      if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    });
+  } catch (error) {
+    console.error("Error fetching parcels:", error);
+    return [];
+  }
+};
+
+// Fetch a single parcel by ID
+export const fetchParcelById = async (parcelId) => {
+  try {
+    const docRef = doc(db, 'parcels', parcelId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching parcel:", error);
+    return null;
+  }
+};
+
+// Add a new parcel (append-only)
+export const addParcel = async (parcelData) => {
+  try {
+    const currentUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    const newParcel = {
+      ...parcelData,
+      isActive: true,
+      createdAt: new Date(),
+      createdBy: currentUser.username || 'unknown'
+    };
+    const docRef = await addDoc(parcelsCollectionRef, newParcel);
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("Error adding parcel:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// "Archive" a parcel (append-only: just mark as inactive)
+export const archiveParcel = async (parcelId) => {
+  try {
+    const parcelDoc = doc(db, 'parcels', parcelId);
+    await updateDoc(parcelDoc, {
+      isActive: false,
+      archivedAt: new Date()
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error archiving parcel:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Reactivate a parcel
+export const reactivateParcel = async (parcelId) => {
+  try {
+    const parcelDoc = doc(db, 'parcels', parcelId);
+    await updateDoc(parcelDoc, {
+      isActive: true,
+      reactivatedAt: new Date()
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error reactivating parcel:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// --- SOIL ANALYSES ---
+
+// Fetch all soil analyses for a parcel (historical, ordered by date)
+export const fetchSoilAnalysesByParcel = async (parcelId) => {
+  try {
+    console.log('Fetching soil analyses for parcelId:', parcelId);
+
+    // Try with orderBy first (requires index)
+    try {
+      const q = query(
+        soilAnalysesCollectionRef,
+        where('parcelId', '==', parcelId),
+        orderBy('date', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      console.log('Query with orderBy executed, found', snapshot.docs.length, 'analyses');
+      const analyses = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log('Mapped analyses:', analyses);
+      return analyses;
+    } catch (indexError) {
+      // If index doesn't exist, fetch without orderBy and sort in memory
+      if (indexError.code === 'failed-precondition') {
+        console.warn('Index not found, falling back to in-memory sort');
+        const q = query(
+          soilAnalysesCollectionRef,
+          where('parcelId', '==', parcelId)
+        );
+        const snapshot = await getDocs(q);
+        console.log('Query without orderBy executed, found', snapshot.docs.length, 'analyses');
+        const analyses = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        // Sort in memory
+        analyses.sort((a, b) => {
+          const dateA = a.date?.toDate?.() || a.date || new Date(0);
+          const dateB = b.date?.toDate?.() || b.date || new Date(0);
+          return dateB - dateA;
+        });
+        console.log('Sorted analyses:', analyses);
+        return analyses;
+      }
+      throw indexError;
+    }
+  } catch (error) {
+    console.error("Error fetching soil analyses:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
+    return [];
+  }
+};
+
+// Fetch all soil analyses (all parcels)
+export const fetchAllSoilAnalyses = async () => {
+  try {
+    const q = query(soilAnalysesCollectionRef, orderBy('date', 'desc'));
+    const snapshot = await getDocs(q);
+    const analyses = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return analyses;
+  } catch (error) {
+    console.error("Error fetching all soil analyses:", error);
+    return [];
+  }
+};
+
+// Fetch latest soil analysis for a parcel
+export const fetchLatestSoilAnalysis = async (parcelId) => {
+  try {
+    const q = query(
+      soilAnalysesCollectionRef,
+      where('parcelId', '==', parcelId),
+      where('status', '==', 'completed'),
+      orderBy('date', 'desc'),
+      firestoreLimit(1)
+    );
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      return { id: doc.id, ...doc.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching latest soil analysis:", error);
+    return null;
+  }
+};
+
+// Add a new soil analysis (simplified - returns analysisId directly)
+export const createSoilAnalysis = async (parcelId, date, notes = "") => {
+  try {
+    const currentUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    const analysisData = {
+      parcelId: parcelId,
+      date: date,
+      notes: notes || '',
+      status: 'completed',
+      createdAt: new Date(),
+      createdBy: currentUser.username || 'unknown'
+    };
+
+    console.log("Creating soil analysis with data:", analysisData);
+    const docRef = await addDoc(soilAnalysesCollectionRef, analysisData);
+
+    console.log("Soil analysis created successfully with ID:", docRef.id);
+    console.log("Saved status field:", analysisData.status);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating soil analysis:", error);
+    throw error;
+  }
+};
+
+// Add a new soil analysis (full version with all fields)
+export const addSoilAnalysis = async (analysisData) => {
+  try {
+    const currentUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    const newAnalysis = {
+      ...analysisData,
+      status: analysisData.status || 'pending',
+      createdAt: serverTimestamp(),
+      createdBy: currentUser.username || 'unknown'
+    };
+    const docRef = await addDoc(soilAnalysesCollectionRef, newAnalysis);
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("Error adding soil analysis:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Update soil analysis status (only allow status changes, not data modification)
+export const updateSoilAnalysisStatus = async (analysisId, status) => {
+  try {
+    const analysisDoc = doc(db, 'soilAnalyses', analysisId);
+    await updateDoc(analysisDoc, {
+      status,
+      statusUpdatedAt: new Date()
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating soil analysis status:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// --- SOIL SAMPLES ---
+
+// Fetch all samples for a soil analysis
+export const fetchSoilSamples = async (analysisId) => {
+  try {
+    const samplesCollectionRef = collection(db, 'soilAnalyses', analysisId, 'samples');
+    const snapshot = await getDocs(samplesCollectionRef);
+    const samples = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return samples.sort((a, b) => (a.sampleNumber || 0) - (b.sampleNumber || 0));
+  } catch (error) {
+    console.error("Error fetching soil samples:", error);
+    return [];
+  }
+};
+
+// Add a soil sample to an analysis (append-only)
+export const addSoilSample = async (analysisId, sampleData) => {
+  try {
+    const samplesCollectionRef = collection(db, 'soilAnalyses', analysisId, 'samples');
+    const newSample = {
+      ...sampleData,
+      createdAt: new Date()
+    };
+    const docRef = await addDoc(samplesCollectionRef, newSample);
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("Error adding soil sample:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Add multiple soil samples at once
+export const addMultipleSoilSamples = async (analysisId, samplesData) => {
+  try {
+    console.log('Adding', samplesData.length, 'samples to analysis:', analysisId);
+    const samplesCollectionRef = collection(db, 'soilAnalyses', analysisId, 'samples');
+
+    for (const sampleData of samplesData) {
+      const newSample = {
+        ...sampleData,
+        createdAt: new Date()
+      };
+      await addDoc(samplesCollectionRef, newSample);
+      console.log('Added sample:', sampleData.sampleNumber);
+    }
+
+    console.log('All samples added successfully');
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding multiple soil samples:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Calculate average values from all samples in an analysis
+export const calculateSoilAnalysisAverages = async (analysisId) => {
+  try {
+    const samples = await fetchSoilSamples(analysisId);
+
+    if (samples.length === 0) {
+      return null;
+    }
+
+    const validSamples = samples.filter(s => s.pH !== null && s.pH !== undefined);
+
+    const averages = {
+      pH: 0,
+      nitrogen: 0,
+      phosphorus: 0,
+      potassium: 0,
+      organicMatter: 0,
+      sampleCount: samples.length
+    };
+
+    const fields = ['pH', 'nitrogen', 'phosphorus', 'potassium', 'organicMatter'];
+
+    fields.forEach(field => {
+      const validValues = samples
+        .map(s => s[field])
+        .filter(v => v !== null && v !== undefined && !isNaN(v));
+
+      if (validValues.length > 0) {
+        const sum = validValues.reduce((acc, val) => acc + val, 0);
+        averages[field] = parseFloat((sum / validValues.length).toFixed(2));
+      }
+    });
+
+    return averages;
+  } catch (error) {
+    console.error("Error calculating soil analysis averages:", error);
+    return null;
+  }
+};
+
+// Calculate detailed statistics (averages, min, max) for a soil analysis
+export const calculateSoilAnalysisStatistics = async (analysisId) => {
+  try {
+    const samples = await fetchSoilSamples(analysisId);
+
+    if (samples.length === 0) {
+      return null;
+    }
+
+    const fields = ['pH', 'nitrogen', 'phosphorus', 'potassium', 'organicMatter'];
+    const statistics = {
+      sampleCount: samples.length,
+      averages: {},
+      min: {},
+      max: {}
+    };
+
+    fields.forEach(field => {
+      const validValues = samples
+        .map(s => s[field])
+        .filter(v => v !== null && v !== undefined && !isNaN(v));
+
+      if (validValues.length > 0) {
+        const sum = validValues.reduce((acc, val) => acc + val, 0);
+        const avg = sum / validValues.length;
+        const min = Math.min(...validValues);
+        const max = Math.max(...validValues);
+
+        statistics.averages[field] = parseFloat(avg.toFixed(2));
+        statistics.min[field] = parseFloat(min.toFixed(2));
+        statistics.max[field] = parseFloat(max.toFixed(2));
+      } else {
+        statistics.averages[field] = 0;
+        statistics.min[field] = 0;
+        statistics.max[field] = 0;
+      }
+    });
+
+    return statistics;
+  } catch (error) {
+    console.error("Error calculating soil analysis statistics:", error);
     return null;
   }
 };

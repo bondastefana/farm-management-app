@@ -214,23 +214,6 @@ const EditLocationConditionsModal = ({ open, onClose, currentData, onDataUpdated
         lastUpdated: new Date()
       };
 
-      // Recalculate water availability if precipitation or water retention changed
-      if (updatedData.climate?.precipitation?.value && updatedData.soil?.waterRetention?.value) {
-        const precipitation = updatedData.climate.precipitation.value;
-        const retention = updatedData.soil.waterRetention.value;
-        const baseAvailability = Math.min(100, (precipitation / 10));
-        const retentionBonus = (retention / 100) * 15;
-        const waterAvailability = Math.min(100, Math.round(baseAvailability + retentionBonus));
-
-        updatedData.waterAvailability = {
-          value: waterAvailability,
-          unit: "index",
-          source: "auto",
-          lastModified: new Date(),
-          description: "Calculated from precipitation and soil water retention"
-        };
-      }
-
       const success = await saveLocationConditions(updatedData);
       if (success) {
         onDataUpdated();

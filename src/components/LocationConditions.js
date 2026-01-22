@@ -22,9 +22,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import TerrainIcon from '@mui/icons-material/Terrain';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LandscapeIcon from '@mui/icons-material/Landscape';
-import WaterIcon from '@mui/icons-material/Water';
 import GrassIcon from '@mui/icons-material/Grass';
-import AgricultureIcon from '@mui/icons-material/Agriculture';
 import {
   fetchLocationConditions,
   saveLocationConditions,
@@ -40,19 +38,19 @@ const LocationConditions = ({ location }) => {
   const [editModalOpen, setEditModalOpen] = React.useState(false);
 
   // Fetch data from Firebase on mount
-  React.useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     setLoading(true);
     const result = await fetchLocationConditions();
     setData(result);
     setLoading(false);
-  };
+  }, []);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Handle fetching data from external APIs
-  const handleFetchData = async () => {
+  const handleFetchData = React.useCallback(async () => {
     if (!location || !location.latitude || !location.longitude) {
       setError(t('locationConditions.noLocationError', 'Location not available. Please enable location services.'));
       return;
@@ -91,10 +89,26 @@ const LocationConditions = ({ location }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location, t]);
+
+  // Auto-fetch external data if no data exists and location is available
+  React.useEffect(() => {
+    const autoFetchIfNeeded = async () => {
+      // Only auto-fetch if:
+      // 1. Location is available
+      // 2. No data exists yet
+      // 3. Not currently loading
+      if (location && location.latitude && location.longitude && !data && !loading) {
+        console.log("Auto-fetching location conditions for first-time setup...");
+        await handleFetchData();
+      }
+    };
+
+    autoFetchIfNeeded();
+  }, [location, data, loading, handleFetchData]);
 
   // Handle refresh - re-fetch auto fields only
-  const handleRefresh = async () => {
+  const handleRefresh = React.useCallback(async () => {
     if (!data || !data.location) {
       handleFetchData();
       return;
@@ -159,7 +173,7 @@ const LocationConditions = ({ location }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [data, handleFetchData, t]);
 
   // Render source badge
   const SourceBadge = ({ source }) => {
@@ -365,197 +379,128 @@ const LocationConditions = ({ location }) => {
       {/* Data display */}
       {!loading && data && (
         <>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {/* Climate Section */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                  {t('locationConditions.climate', 'Climate')}
-                </Typography>
-                <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="climate">
-                  📊
+            <Grid size={{ xs: 12 }}>
+              <Paper elevation={2} sx={{ p: 2, bgcolor: 'background.default' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
+                  <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
+                    {t('locationConditions.climate', 'Climate')}
+                  </Typography>
+                  <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="climate">
+                    📊
+                  </Box>
                 </Box>
-              </Box>
-              <DataField
-                icon={<ThermostatIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.avgTemperature', 'Avg. Temperature')}
-                value={data.climate?.temperature?.value}
-                unit={data.climate?.temperature?.unit || '°C'}
-                source={data.climate?.temperature?.source}
-              />
-              <DataField
-                icon={<WaterDropIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.precipitation', 'Precipitation')}
-                value={data.climate?.precipitation?.value}
-                unit={data.climate?.precipitation?.unit || 'mm/year'}
-                source={data.climate?.precipitation?.source}
-              />
-              <DataField
-                icon={<AcUnitIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.frostDays', 'Frost Days')}
-                value={data.climate?.frostDays?.value}
-                unit={data.climate?.frostDays?.unit || ' days/year'}
-                source={data.climate?.frostDays?.source}
-              />
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <DataField
+                      icon={<ThermostatIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.avgTemperature', 'Avg. Temperature')}
+                      value={data.climate?.temperature?.value}
+                      unit={data.climate?.temperature?.unit || '°C'}
+                      source={data.climate?.temperature?.source}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <DataField
+                      icon={<WaterDropIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.precipitation', 'Precipitation')}
+                      value={data.climate?.precipitation?.value}
+                      unit={data.climate?.precipitation?.unit || 'mm/year'}
+                      source={data.climate?.precipitation?.source}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <DataField
+                      icon={<AcUnitIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.frostDays', 'Frost Days')}
+                      value={data.climate?.frostDays?.value}
+                      unit={data.climate?.frostDays?.unit || ' days/year'}
+                      source={data.climate?.frostDays?.source}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
             </Grid>
 
             {/* Soil Section */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                  {t('locationConditions.soil', 'Soil')}
-                </Typography>
-                <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="soil">
-                  🌱
+            <Grid size={{ xs: 12 }}>
+              <Paper elevation={2} sx={{ p: 2, bgcolor: 'background.default' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
+                  <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
+                    {t('locationConditions.soil', 'Soil')}
+                  </Typography>
+                  <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="soil">
+                    🌱
+                  </Box>
                 </Box>
-              </Box>
-              <DataField
-                icon={<ScienceIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.pH', 'pH Level')}
-                value={data.soil?.pH?.value}
-                unit={data.soil?.pH?.unit || ''}
-                source={data.soil?.pH?.source}
-              />
-              <DataField
-                icon={<TerrainIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.soilType', 'Soil Type')}
-                value={data.soil?.soilType?.value}
-                unit={data.soil?.soilType?.unit || ''}
-                source={data.soil?.soilType?.source}
-                translateValue={true}
-              />
-              <DataField
-                icon={<OpacityIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.waterRetention', 'Water Retention')}
-                value={data.soil?.waterRetention?.value}
-                unit={data.soil?.waterRetention?.unit || '%'}
-                source={data.soil?.waterRetention?.source}
-              />
-              <DataField
-                icon={<GrassIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.nitrogen', 'Nitrogen')}
-                value={data.soil?.nitrogen?.value}
-                unit={data.soil?.nitrogen?.unit || 'g/kg'}
-                source={data.soil?.nitrogen?.source}
-              />
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <DataField
+                      icon={<ScienceIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.pH', 'pH Level')}
+                      value={data.soil?.pH?.value}
+                      unit={data.soil?.pH?.unit || ''}
+                      source={data.soil?.pH?.source}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <DataField
+                      icon={<TerrainIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.soilType', 'Soil Type')}
+                      value={data.soil?.soilType?.value}
+                      unit={data.soil?.soilType?.unit || ''}
+                      source={data.soil?.soilType?.source}
+                      translateValue={true}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <DataField
+                      icon={<OpacityIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.waterRetention', 'Water Retention')}
+                      value={data.soil?.waterRetention?.value}
+                      unit={data.soil?.waterRetention?.unit || '%'}
+                      source={data.soil?.waterRetention?.source}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <DataField
+                      icon={<GrassIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.nitrogen', 'Nitrogen')}
+                      value={data.soil?.nitrogen?.value}
+                      unit={data.soil?.nitrogen?.unit || 'g/kg'}
+                      source={data.soil?.nitrogen?.source}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
             </Grid>
 
             {/* Altitude Section */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                  {t('locationConditions.altitude', 'Altitude')}
-                </Typography>
-                <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="altitude">
-                  ⛰️
-                </Box>
-              </Box>
-              <DataField
-                icon={<LandscapeIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                label={t('locationConditions.elevation', 'Elevation')}
-                value={data.altitude?.elevation?.value}
-                unit={data.altitude?.elevation?.unit || 'm'}
-                source={data.altitude?.elevation?.source}
-              />
-            </Grid>
-
-            {/* Water Availability Section */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                  {t('locationConditions.waterAvailability', 'Water Availability')}
-                </Typography>
-                <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="water">
-                  💧
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 1.5,
-                mb: 2,
-                py: 0.5
-              }}>
-                {/* Icon - Fixed width for alignment */}
-                <Box sx={{
-                  minWidth: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pt: 0.5
-                }}>
-                  <WaterIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                </Box>
-
-                {/* Label and Value */}
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary', lineHeight: 1.4 }}>
-                    {t('locationConditions.availabilityIndex', 'Availability Index')}
+            <Grid size={{ xs: 12 }}>
+              <Paper elevation={2} sx={{ p: 2, bgcolor: 'background.default' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
+                  <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
+                    {t('locationConditions.altitude', 'Altitude')}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-                      {data.waterAvailability?.value}{data.waterAvailability?.unit === 'index' ? '/100' : (data.waterAvailability?.unit || '')}
-                    </Typography>
-                    {data.waterAvailability?.source && <SourceBadge source={data.waterAvailability.source} />}
+                  <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="altitude">
+                    ⛰️
                   </Box>
-                  {data.waterAvailability?.description && (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4, mt: 0.5 }}>
-                      {t('locationConditions.calculatedFromPrecip', data.waterAvailability.description)}
-                    </Typography>
-                  )}
                 </Box>
-              </Box>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <DataField
+                      icon={<LandscapeIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                      label={t('locationConditions.elevation', 'Elevation')}
+                      value={data.altitude?.elevation?.value}
+                      unit={data.altitude?.elevation?.unit || 'm'}
+                      source={data.altitude?.elevation?.source}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
             </Grid>
 
-            {/* Agriculture Section */}
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, pb: 1, borderBottom: '2px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                  {t('locationConditions.agriculture', 'Agriculture')}
-                </Typography>
-                <Box component="span" sx={{ fontSize: 18 }} role="img" aria-label="agriculture">
-                  🚜
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 1.5,
-                mb: 2,
-                py: 0.5
-              }}>
-                {/* Icon - Fixed width for alignment */}
-                <Box sx={{
-                  minWidth: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pt: 0.5
-                }}>
-                  <AgricultureIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                </Box>
-
-                {/* Label and Value */}
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary', lineHeight: 1.4 }}>
-                    {t('locationConditions.previousCrop', 'Previous Crop')}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-                      {data.previousCrop?.cropId
-                        ? t(`cropRecommendations.crops.${data.previousCrop.cropId}`, data.previousCrop.cropId)
-                        : '-'}
-                    </Typography>
-                    {data.previousCrop?.source && <SourceBadge source={data.previousCrop.source} />}
-                  </Box>
-                  {data.previousCrop?.harvestDate && (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4, mt: 0.5 }}>
-                      {t('locationConditions.harvestedOn', 'Harvested')}: {new Date(data.previousCrop.harvestDate.seconds * 1000 || data.previousCrop.harvestDate).toLocaleDateString()}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-            </Grid>
           </Grid>
 
           {/* Last updated timestamp */}
