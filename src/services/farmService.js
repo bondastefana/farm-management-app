@@ -1815,8 +1815,6 @@ export const calculateSoilAnalysisAverages = async (analysisId) => {
       return null;
     }
 
-    const validSamples = samples.filter(s => s.pH !== null && s.pH !== undefined);
-
     const averages = {
       pH: 0,
       nitrogen: 0,

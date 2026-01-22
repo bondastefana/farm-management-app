@@ -21,7 +21,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import AddIcon from '@mui/icons-material/Add';
 import {
   fetchSoilAnalysesByParcel,
-  fetchSoilSamples,
   calculateSoilAnalysisStatistics
 } from "../services/farmService";
 
